@@ -7,7 +7,7 @@ import java.util.Date
  * Usamos 'val' para que sea inmutable (buena práctica en Compose/Flow).
  * Para modificarlo, usamos el método .copy()
  */
-data class Event(
+data class  Event(
     val id: String,
     val name: String,
     val date: Long,

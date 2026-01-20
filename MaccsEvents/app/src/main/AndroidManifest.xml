@@ -15,7 +15,7 @@
             android:name=".ui.profile.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.event.EventDetailActivity"
+            android:name=".ui.event.EventDetailViewModel"
             android:exported="false" />
         <activity
             android:name=".ui.event.CreateEventActivity"
