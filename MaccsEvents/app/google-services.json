@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "368676373237",
+    "project_id": "maccsevents",
+    "storage_bucket": "maccsevents.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368676373237:android:25f560fb2a436e805e7bbc",
+        "android_client_info": {
+          "package_name": "com.maccs.events"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_BUsnKgoG3V5Vbk92Qr8CbeGG2h8zkcE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
