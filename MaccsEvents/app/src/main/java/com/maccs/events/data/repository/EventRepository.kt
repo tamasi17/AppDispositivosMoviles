@@ -42,4 +42,5 @@ class EventRepository {
             dataSource.toggleAttendance(eventId)
         }
 
+    }
 }
