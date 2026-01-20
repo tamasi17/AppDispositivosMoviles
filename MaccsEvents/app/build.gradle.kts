@@ -71,4 +71,7 @@ dependencies {
 
     // Firestore (Base de datos) - La dejamos ya preparada:
     implementation("com.google.firebase:firebase-firestore")
+
+    //Cargador de imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
