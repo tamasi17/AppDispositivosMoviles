@@ -76,4 +76,7 @@ dependencies {
 
     // Firebase Auth
     implementation("com.google.firebase:firebase-auth")
+    
+    //Cargador de imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
