@@ -63,6 +63,18 @@ fun EventFormScreen(eventId: String?) {
                     modifier = Modifier.weight(0.5f)
                 )
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = { /* Lógica para guardar */ },
+                modifier = Modifier.align(androidx.compose.ui.Alignment.End),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBB86FC)),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+            ) {
+                Text("Guardar", color = Color.White)
+            }
         }
     }
 }
