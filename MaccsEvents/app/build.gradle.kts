@@ -63,6 +63,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
     // BOM de Firebase (Ayuda a gestionar versiones)
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
 
@@ -72,4 +73,7 @@ dependencies {
 
     // Firestore (Base de datos) - La dejamos ya preparada:
     implementation("com.google.firebase:firebase-firestore")
+
+    // Firebase Auth
+    implementation("com.google.firebase:firebase-auth")
 }

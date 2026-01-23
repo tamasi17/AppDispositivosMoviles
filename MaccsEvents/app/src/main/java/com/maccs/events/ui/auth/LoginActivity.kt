@@ -1,5 +1,7 @@
 package com.maccs.events.ui.auth
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,33 +22,57 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.maccs.events.R
+import com.maccs.events.ui.home.HomeActivity
 
 import com.maccs.events.ui.theme.*
 class LoginActivity : ComponentActivity() {
+
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
+        // Inicializamos Firebase
+        auth = FirebaseAuth.getInstance()
+
+        // Usamos setContent (Compose)
         setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Black
-            ) {
-                LoginScreen(
-                    onLoginSuccess = {
-                        // por ahora, solo aparecerá un mensaje
-                        Toast.makeText(this, "Login exitoso", Toast.LENGTH_SHORT).show()
-                        // Aquí iría el Intent para abrir la HomeActivity más adelante
-                    }
-                )
-            }
+            // Llamamos a la pantalla de login
+            LoginScreen(
+                // Definimos qué pasa cuando el usuario pulsa el botón en la UI
+                onLoginClick = { emailInput, passwordInput ->
+                    realizarLoginEnFirebase(emailInput, passwordInput)
+                }
+            )
         }
+    }
+
+    // Separamos la lógica de login en una función privada para que quede más limpio
+    private fun realizarLoginEnFirebase(email: String, pass: String) {
+        auth.signInWithEmailAndPassword(email, pass)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d("Firebase", "signInWithEmail:success")
+                    // Navegar al Home
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Log.w("Firebase", "signInWithEmail:failure", task.exception)
+                    Toast.makeText(
+                        baseContext,
+                        "Error: ${task.exception?.message}", // tira exception
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
     }
 }
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(onLoginClick: (String, String) -> Unit) {
     // 2. Gestión de Estado (State)
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -111,9 +137,9 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         // botón de entrar
         Button(
             onClick = {
-                // Criterio de aceptación: Solo funciona si ambos tienen texto
                 if (email.isNotBlank() && password.isNotBlank()) {
-                    onLoginSuccess()
+                    // Pasamos los datos escritos a la Activity
+                    onLoginClick(email, password)
                 }
             },
             modifier = Modifier
