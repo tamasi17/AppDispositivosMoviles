@@ -1,47 +1,33 @@
 package com.maccs.events
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.maccs.events.ui.theme.MaccsEventsTheme
+import com.maccs.events.ui.auth.LoginActivity
+import com.maccs.events.ui.home.HomeActivity // Asumiendo que existe
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            MaccsEventsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+
+        // AQUÍ VA TU LÓGICA DE ENRUTAMIENTO
+
+        // 1. (Opcional) Comprobar si hay usuario guardado (Simulado por ahora)
+        val isUserLoggedIn = false
+
+        val intent = if (isUserLoggedIn) {
+            // Si ya está logueado, vamos directo al Home
+            Intent(this, HomeActivity::class.java)
+        } else {
+            // Si no, vamos al Login
+            Intent(this, LoginActivity::class.java)
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+        // 2. Arrancar la actividad
+        startActivity(intent)
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MaccsEventsTheme {
-        Greeting("Android")
+        // 3. ¡IMPORTANTE! Matar la MainActivity para que el usuario
+        // no pueda volver a ella pulsando "Atrás"
+        finish()
     }
 }
