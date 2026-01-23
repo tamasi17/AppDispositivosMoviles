@@ -1,21 +1,21 @@
 package com.maccs.events.ui.event
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.maccs.events.R
 
-class CreateEventActivity : AppCompatActivity() {
+class CreateEventActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_create_event)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        // Obtenemos el ID si existe (para saber si editamos)
+        val eventId = intent.getStringExtra("EVENT_ID")
+
+        setContent {
+            // Aquí llamaremos a la pantalla en el siguiente paso
+            EventFormScreen(eventId = eventId)
         }
     }
 }
