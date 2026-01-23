@@ -28,6 +28,41 @@ fun EventFormScreen(eventId: String?) {
                 color = Color.Gray,
                 style = MaterialTheme.typography.bodySmall
             )
+
+            var eventTitle by remember { mutableStateOf("") }
+            var location by remember { mutableStateOf("") }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Campo Título
+            OutlinedTextField(
+                value = eventTitle,
+                onValueChange = { eventTitle = it },
+                label = { Text("Título del evento") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFBB86FC),
+                    unfocusedBorderColor = Color.DarkGray,
+                    focusedTextColor = Color.White
+                )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Fila para Fecha y Hora
+            Row(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = "", onValueChange = {},
+                    label = { Text("dd/MM/yyyy") },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                OutlinedTextField(
+                    value = "", onValueChange = {},
+                    label = { Text("Hora") },
+                    modifier = Modifier.weight(0.5f)
+                )
+            }
         }
     }
 }
