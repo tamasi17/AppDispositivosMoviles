@@ -9,12 +9,17 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = Purple80,        // Morado claro para mejor contraste en fondo oscuro
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    background = Black,        // Fondo negro puro
+    surface = Color(0xFF121212), // Un gris casi negro para las tarjetas
+    onBackground = White,      // Texto blanco sobre fondo negro
+    onSurface = White
 )
 
 private val LightColorScheme = lightColorScheme(
