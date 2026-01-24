@@ -26,7 +26,6 @@ fun EventFormScreen(eventId: String?) {
         modifier = Modifier.fillMaxSize(),
         color = Color.Black
     ) {
-        // Añadimos verticalScroll por si los campos no caben al abrir el teclado
         Column(
             modifier = Modifier
                 .padding(24.dp)
@@ -38,13 +37,16 @@ fun EventFormScreen(eventId: String?) {
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
+
+            //texto debajo del títuñp
             Text(
-                text = "Define un evento personal o selecciona colaborativo si eres administrador de uno",
+                text = "No pierdas la oportunidad de anunciar tu evento. Rellena los campos con la información correcta.",
                 color = Color.Gray,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Campo Título
             OutlinedTextField(
@@ -55,7 +57,8 @@ fun EventFormScreen(eventId: String?) {
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFFBB86FC),
                     unfocusedBorderColor = Color.DarkGray,
-                    focusedTextColor = Color.White
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
                 )
             )
 
@@ -70,7 +73,9 @@ fun EventFormScreen(eventId: String?) {
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFFBB86FC),
                     unfocusedBorderColor = Color.DarkGray,
-                    focusedTextColor = Color.White
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+
                 )
             )
 
@@ -81,23 +86,32 @@ fun EventFormScreen(eventId: String?) {
                 OutlinedTextField(
                     value = date,
                     onValueChange = { date = it },
-                    label = { Text("dd/MM/yyyy") },
+                    label = { Text("dd/MM/yyyy", color = Color.Gray) },
                     modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFBB86FC))
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFFBB86FC),
+                        unfocusedBorderColor = Color.DarkGray,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White
+                    )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedTextField(
                     value = time,
                     onValueChange = { time = it },
-                    label = { Text("Hora") },
+                    label = { Text("Hora", color = Color.Gray) },
                     modifier = Modifier.weight(0.5f),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFBB86FC))
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFFBB86FC),
+                        unfocusedBorderColor = Color.DarkGray,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White
+                    )
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // --- AQUÍ VA LO NUEVO ---
 
             // Campo Descripción
             OutlinedTextField(
@@ -115,14 +129,19 @@ fun EventFormScreen(eventId: String?) {
             Spacer(modifier = Modifier.height(8.dp))
 
             // Fila para Imagen y Precio
+            // Fila para Imagen y Precio
             Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = "Imagen",
                     onValueChange = {},
                     label = { Text("Imagen", color = Color.Gray) },
                     modifier = Modifier.weight(1f),
-                    enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.DarkGray)
+                    enabled = false, // Se mantiene estático como en la imagen
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledBorderColor = Color.DarkGray,
+                        disabledLabelColor = Color.Gray,
+                        disabledTextColor = Color.Gray
+                    )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedTextField(
@@ -130,24 +149,29 @@ fun EventFormScreen(eventId: String?) {
                     onValueChange = { price = it },
                     label = { Text("Precio", color = Color.Gray) },
                     modifier = Modifier.weight(1f),
+                    // Sugerencia: teclado numérico
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                    ),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFFBB86FC),
                         unfocusedBorderColor = Color.DarkGray,
-                        focusedTextColor = Color.White
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White // Para que el texto no "desaparezca" al perder foco
                     )
                 )
             }
 
-            // --- FIN DE LO NUEVO ---
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            //botón guardar
             Button(
                 onClick = { /* Lógica para guardar */ },
-                modifier = Modifier.align(Alignment.End),
+                modifier = Modifier.align(Alignment.End).width(120.dp).height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBB86FC)),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
             ) {
                 Text("Guardar", color = Color.White)
             }
