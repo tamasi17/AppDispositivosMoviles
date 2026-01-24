@@ -10,6 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 
 @Composable
 fun EventFormScreen(eventId: String?) {
@@ -21,6 +24,18 @@ fun EventFormScreen(eventId: String?) {
     var price by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
+
+
+    // Para añadir imágen de la galería
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Lanzador para abrir la galería
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
+    }
+
 
     //lógica de validación al pulsar el boton "Guardar"
     // El formulario es válido si el título, localización, fecha y hora no están vacíos
@@ -139,19 +154,26 @@ fun EventFormScreen(eventId: String?) {
 
             // Fila para Imagen y Precio
             Row(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = "Imagen",
-                    onValueChange = {},
-                    label = { Text("Imagen", color = Color.Gray) },
-                    modifier = Modifier.weight(1f),
-                    enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = Color.DarkGray,
-                        disabledLabelColor = Color.Gray,
-                        disabledTextColor = Color.Gray
+                OutlinedButton(
+                    onClick = { galleryLauncher.launch("image/*") }, // Abre la galería
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp)
+                        .padding(top = 8.dp),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.DarkGray),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Gray)
+                ) {
+                    // Si ya se ha seleccionado una imagen, aparece mensaje
+                    Text(
+                        text = if (selectedImageUri != null) "✓ Foto Lista" else "Añadir Imagen",
+                        color = if (selectedImageUri != null) Color(0xFFBB86FC) else Color.Gray
                     )
-                )
+                }
+
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 OutlinedTextField(
                     value = price,
                     onValueChange = { price = it },
@@ -165,7 +187,7 @@ fun EventFormScreen(eventId: String?) {
                         focusedBorderColor = Color(0xFFBB86FC),
                         unfocusedBorderColor = Color.DarkGray,
                         focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White // Para que el texto no "desaparezca" al perder foco
+                        unfocusedTextColor = Color.White
                     )
                 )
             }
