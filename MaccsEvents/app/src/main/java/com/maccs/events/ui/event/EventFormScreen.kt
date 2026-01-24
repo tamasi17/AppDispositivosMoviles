@@ -13,7 +13,15 @@ import androidx.compose.ui.unit.dp
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.Locale
+import androidx.compose.foundation.clickable
+import java.util.*
 
+
+
+@OptIn(ExperimentalMaterial3Api::class) // para DatePicker y TimePicker
 @Composable
 fun EventFormScreen(eventId: String?) {
     val titleText = if (eventId == null) "Nuevo Evento" else "Editar Evento"
@@ -35,6 +43,11 @@ fun EventFormScreen(eventId: String?) {
     ) { uri: Uri? ->
         selectedImageUri = uri
     }
+
+    //para el campo de fecha
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    val calendar = Calendar.getInstance()
 
 
     //lógica de validación al pulsar el boton "Guardar"
@@ -105,33 +118,46 @@ fun EventFormScreen(eventId: String?) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Fila para Fecha y Hora
+            // Fila para Fecha y Hora con selectores
             Row(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = date,
-                    onValueChange = { date = it },
-                    label = { Text("dd/MM/yyyy", color = Color.Gray) },
-                    modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFBB86FC),
-                        unfocusedBorderColor = Color.DarkGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
+                // Selector de Fecha
+                Box(modifier = Modifier.weight(1f)) {
+                    OutlinedTextField(
+                        value = date,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("dd/MM/yyyy", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFFBB86FC),
+                            unfocusedBorderColor = Color.DarkGray,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        )
                     )
-                )
+
+                    Box(modifier = Modifier.matchParentSize().clickable { showDatePicker = true })
+                }
+
                 Spacer(modifier = Modifier.width(8.dp))
-                OutlinedTextField(
-                    value = time,
-                    onValueChange = { time = it },
-                    label = { Text("Hora", color = Color.Gray) },
-                    modifier = Modifier.weight(0.5f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFBB86FC),
-                        unfocusedBorderColor = Color.DarkGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
+
+                // Selector de Hora
+                Box(modifier = Modifier.weight(0.5f)) {
+                    OutlinedTextField(
+                        value = time,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Hora", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFFBB86FC),
+                            unfocusedBorderColor = Color.DarkGray,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        )
                     )
-                )
+                    Box(modifier = Modifier.matchParentSize().clickable { showTimePicker = true })
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -223,6 +249,44 @@ fun EventFormScreen(eventId: String?) {
                     color = if (isFormValid) Color.White else Color.Gray
                 )
             }
+        }
+
+        // lógica para las ventanas emergentes (POP-UPS)
+        if (showDatePicker) {
+            val datePickerState = rememberDatePickerState()
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val selectedDate = Date(millis)
+                            date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)
+                        }
+                        showDatePicker = false
+                    }) { Text("Aceptar") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+                }
+            ) { DatePicker(state = datePickerState) }
+        }
+
+        if (showTimePicker) {
+            val timePickerState = rememberTimePickerState()
+            AlertDialog(
+                onDismissRequest = { showTimePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        time = String.format("%02d:%02d", timePickerState.hour, timePickerState.minute)
+                        showTimePicker = false
+                    }) { Text("Aceptar") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showTimePicker = false }) { Text("Cancelar") }
+                },
+                title = { Text("Selecciona la hora") },
+                text = { TimePicker(state = timePickerState) }
+            )
         }
     }
 }
