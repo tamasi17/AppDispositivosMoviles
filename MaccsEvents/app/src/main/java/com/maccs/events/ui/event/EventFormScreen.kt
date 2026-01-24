@@ -22,6 +22,13 @@ fun EventFormScreen(eventId: String?) {
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
 
+    //lógica de validación al pulsar el boton "Guardar"
+    // El formulario es válido si el título, localización, fecha y hora no están vacíos
+    val isFormValid = eventTitle.isNotBlank() &&
+            location.isNotBlank() &&
+            date.isNotBlank() &&
+            time.isNotBlank()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.Black
@@ -38,7 +45,7 @@ fun EventFormScreen(eventId: String?) {
                 fontWeight = FontWeight.Bold
             )
 
-            //texto debajo del títuñp
+            //texto debajo del título
             Text(
                 text = "No pierdas la oportunidad de anunciar tu evento. Rellena los campos con la información correcta.",
                 color = Color.Gray,
@@ -54,6 +61,7 @@ fun EventFormScreen(eventId: String?) {
                 onValueChange = { eventTitle = it },
                 label = { Text("Título del evento") },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFFBB86FC),
                     unfocusedBorderColor = Color.DarkGray,
@@ -70,6 +78,7 @@ fun EventFormScreen(eventId: String?) {
                 onValueChange = { location = it },
                 label = { Text("Localización") },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFFBB86FC),
                     unfocusedBorderColor = Color.DarkGray,
@@ -129,14 +138,13 @@ fun EventFormScreen(eventId: String?) {
             Spacer(modifier = Modifier.height(8.dp))
 
             // Fila para Imagen y Precio
-            // Fila para Imagen y Precio
             Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = "Imagen",
                     onValueChange = {},
                     label = { Text("Imagen", color = Color.Gray) },
                     modifier = Modifier.weight(1f),
-                    enabled = false, // Se mantiene estático como en la imagen
+                    enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
                         disabledBorderColor = Color.DarkGray,
                         disabledLabelColor = Color.Gray,
@@ -149,7 +157,7 @@ fun EventFormScreen(eventId: String?) {
                     onValueChange = { price = it },
                     label = { Text("Precio", color = Color.Gray) },
                     modifier = Modifier.weight(1f),
-                    // Sugerencia: teclado numérico
+                    // teclado numérico
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
                     ),
@@ -167,13 +175,31 @@ fun EventFormScreen(eventId: String?) {
 
             //botón guardar
             Button(
-                onClick = { /* Lógica para guardar */ },
-                modifier = Modifier.align(Alignment.End).width(120.dp).height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBB86FC)),
+                onClick = {
+                    if (isFormValid) {
+                        // Aquí va la lógica para enviar la info a la BD
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .width(120.dp)
+                    .height(48.dp),
+                // El botón se deshabilita si el formulario no es válido
+                enabled = isFormValid,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    disabledContainerColor = Color.Black.copy(alpha = 0.5f)
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = if (isFormValid) Color(0xFFBB86FC) else Color.DarkGray
+                ),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
             ) {
-                Text("Guardar", color = Color.White)
+                Text(
+                    text = "Guardar",
+                    color = if (isFormValid) Color.White else Color.Gray
+                )
             }
         }
     }
