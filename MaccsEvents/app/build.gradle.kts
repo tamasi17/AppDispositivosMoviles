@@ -79,4 +79,12 @@ dependencies {
     
     //Cargador de imágenes
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Iconos básicos
+    implementation("androidx.compose.material:material-icons-core")
+
+    // Iconos extendidos (Añadir, Favoritos, etc. suelen estar aquí)
+    implementation("androidx.compose.material:material-icons-extended")
+
+    implementation("androidx.navigation:navigation-compose:2.8.5")
 }
