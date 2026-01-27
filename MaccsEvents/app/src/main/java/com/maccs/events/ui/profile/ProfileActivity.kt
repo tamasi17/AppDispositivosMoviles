@@ -23,14 +23,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maccs.events.R
 import com.maccs.events.ui.theme.*
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import android.net.Uri
 
 class ProfileViewModel : ViewModel() {
     var nombre by mutableStateOf("")
     var mail by mutableStateOf("")
     val idNoEditable by mutableStateOf("USER-12345")
+    var imageUri by mutableStateOf<Uri?>(null)
 
     fun onNombreChange(newValue: String) { nombre = newValue }
     fun onMailChange(newValue: String) { mail = newValue }
+    fun onImageSelected(uri: Uri?) { imageUri = uri }
     fun guardarPerfil() { println("Guardando: $nombre") }
     fun cerrarSesion(onSuccess: () -> Unit) {
         // En el futuro aquí irá Firebase.auth.signOut()
@@ -56,6 +66,13 @@ class ProfileActivity : ComponentActivity() {
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel) {
     val context = LocalContext.current
+
+
+    // código que abre la galeria para añadir foto
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> viewModel.onImageSelected(uri) }
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -78,15 +95,33 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
         Box(
             modifier = Modifier
                 .size(160.dp)
-                .border(2.dp, White, CircleShape),
+                .clip(CircleShape) // Corta la imagen en círculo
+                .border(2.dp, White, CircleShape)
+                .clickable {
+                    // Al pulsar, abrimos la galería (solo imágenes)
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.profile_icon_svg),
-                contentDescription = null,
-                modifier = Modifier.size(100.dp),
-                tint = White
-            )
+            if (viewModel.imageUri != null) {
+                // Si hay una imagen seleccionada, la mostramos con Coil
+                AsyncImage(
+                    model = viewModel.imageUri,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                // Si no, mostramos el icono por defecto
+                Icon(
+                    painter = painterResource(id = R.drawable.profile_icon_svg),
+                    contentDescription = null,
+                    modifier = Modifier.size(100.dp),
+                    tint = White
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(40.dp))

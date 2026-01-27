@@ -2,6 +2,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import android.net.Uri
 
 class ProfileViewModel : ViewModel() {
     // Definimos los estados para cada campo
@@ -9,12 +10,18 @@ class ProfileViewModel : ViewModel() {
     var mail by mutableStateOf("")
     val idNoEditable by mutableStateOf("USER-12345") // Hardcoded por ahora
 
+    var imageUri by mutableStateOf<Uri?>(null)
+
     fun onNombreChange(newValue: String) {
         nombre = newValue
     }
 
     fun onMailChange(newValue: String) {
         mail = newValue
+    }
+
+    fun onImageSelected(uri: Uri?) {
+        imageUri = uri
     }
 
     fun guardarPerfil() {
