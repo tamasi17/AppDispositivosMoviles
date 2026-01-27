@@ -84,11 +84,11 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
         Text(
             text = "Mi Perfil",
             color = LigthPurple,
-            fontSize = 28.sp, // Un poco más grande para que resalte
-            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.ExtraBold,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp, bottom = 40.dp)
+                .padding(top = 48.dp, bottom = 32.dp)
         )
 
         // Imagen de perfil circular
