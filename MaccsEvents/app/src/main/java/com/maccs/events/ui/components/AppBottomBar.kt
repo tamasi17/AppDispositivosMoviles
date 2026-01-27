@@ -1,19 +1,22 @@
-package com.maccs.events.ui.components // Ajusta al nombre de tu paquete
+package com.maccs.events.ui.components
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.ui.tooling.preview.Preview
 import android.content.res.Configuration
-import androidx.navigation.compose.rememberNavController
 import com.maccs.events.ui.theme.MaccsEventsTheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.res.painterResource
+import android.content.Intent
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.size
 @Composable
-fun AppBottomBar(navController: NavHostController) {
+fun AppBottomBar() {
+    val context = LocalContext.current
     val items = listOf(
         BottomBarScreen.Home,
         BottomBarScreen.Create,
@@ -21,53 +24,48 @@ fun AppBottomBar(navController: NavHostController) {
         BottomBarScreen.Profile
     )
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val isDark = isSystemInDarkTheme()
 
     NavigationBar(
-        containerColor = Color(0xFF000000),
-        contentColor = Color.White
+        containerColor = if (isDark) Color.Black else Color.White,
+        tonalElevation = 0.dp
     ) {
         items.forEach { screen ->
-            val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+            val isSelected = context.javaClass == screen.activityClass
 
             NavigationBarItem(
                 selected = isSelected,
-                label = {
-                    Text(
-                        text = screen.title,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
+                label = null,
+                alwaysShowLabel = false,
                 icon = {
                     Icon(
-                        imageVector = if (isSelected) screen.selectedIcon else screen.unselectedIcon,
-                        contentDescription = screen.title
+                        painter = painterResource(id = screen.icon),
+                        contentDescription = null,
+                        // Iconos un poco más pequeños y con más espacio a los lados
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(horizontal = 2.dp),
+                        tint = if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            if (isDark) Color.White else Color.Black
+                        }
                     )
                 },
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
+                    if (!isSelected) {
+                        val intent = Intent(context, screen.activityClass)
+                        intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                        context.startActivity(intent)
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    // Color cuando está seleccionado (usa el color primario del tema)
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                    // Color cuando NO está seleccionado
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    indicatorColor = Color.Transparent
                 )
             )
         }
     }
 }
-
 
 @Preview(
     name = "Modo Claro",
@@ -80,15 +78,13 @@ fun AppBottomBar(navController: NavHostController) {
 )
 @Composable
 fun AppBottomBarPreview() {
-    val navController = rememberNavController()
-
+    // Ya no necesitas crear el navController aquí
     MaccsEventsTheme {
-        // El Surface es vital: es el que "pinta" el fondo según el tema
         Surface(
             color = MaterialTheme.colorScheme.background
         ) {
-            val navController = rememberNavController()
-            AppBottomBar(navController = navController)
+            // Llama a la función sin pasarle ningún parámetro
+            AppBottomBar()
         }
     }
 }

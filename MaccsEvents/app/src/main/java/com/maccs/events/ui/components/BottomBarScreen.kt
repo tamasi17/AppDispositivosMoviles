@@ -1,43 +1,24 @@
 package com.maccs.events.ui.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.AddCircleOutline
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.ui.graphics.vector.ImageVector
+import android.content.Intent
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.maccs.events.R
+import com.maccs.events.ui.home.HomeActivity
+import com.maccs.events.ui.event.CreateEventActivity
+import com.maccs.events.ui.home.SearchEventActivity
+import com.maccs.events.ui.profile.ProfileActivity
+
 sealed class BottomBarScreen(
-    val route: String,
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val icon: Int, // Solo un icono por pantalla
+    val activityClass: Class<*>
 ) {
-    object Home : BottomBarScreen(
-        route = "home",
-        title = "Inicio",
-        selectedIcon = Icons.Filled.Home,
-        unselectedIcon = Icons.Outlined.Home
-    )
-    object Create : BottomBarScreen(
-        route = "create",
-        title = "Añadir",
-        selectedIcon = Icons.Filled.AddCircle,
-        unselectedIcon = Icons.Outlined.AddCircleOutline
-    )
-    object Favorites : BottomBarScreen(
-        route = "favorites",
-        title = "Favoritos",
-        selectedIcon = Icons.Filled.Favorite,
-        unselectedIcon = Icons.Outlined.FavoriteBorder
-    )
-    object Profile : BottomBarScreen(
-        route = "profile",
-        title = "Perfil",
-        selectedIcon = Icons.Filled.Person,
-        unselectedIcon = Icons.Outlined.Person
-    )
+    object Home : BottomBarScreen(R.drawable.calendar_icon_svg, HomeActivity::class.java)
+    object Create : BottomBarScreen(R.drawable.plus_icon_svg, CreateEventActivity::class.java)
+    object Favorites : BottomBarScreen(R.drawable.fav_icon, SearchEventActivity::class.java)
+    object Profile : BottomBarScreen(R.drawable.profile_icon_svg, ProfileActivity::class.java)
 }
