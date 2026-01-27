@@ -21,4 +21,12 @@ class ProfileViewModel : ViewModel() {
         // Aquí irá la lógica para guardar en Firebase o base de datos local
         println("Guardando perfil: $nombre - $mail")
     }
+
+    fun cerrarSesion(onSuccess: () -> Unit) {
+        // Aquí borraremos los datos del usuario en el futuro
+        // Firebase.auth.signOut()
+
+        println("Sesión cerrada")
+        onSuccess()
+    }
 }

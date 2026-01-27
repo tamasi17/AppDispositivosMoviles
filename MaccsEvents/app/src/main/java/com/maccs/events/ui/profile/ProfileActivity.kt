@@ -1,5 +1,6 @@
 package com.maccs.events.ui.profile
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,7 +24,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maccs.events.R
 import com.maccs.events.ui.theme.*
 
-
 class ProfileViewModel : ViewModel() {
     var nombre by mutableStateOf("")
     var mail by mutableStateOf("")
@@ -31,6 +32,11 @@ class ProfileViewModel : ViewModel() {
     fun onNombreChange(newValue: String) { nombre = newValue }
     fun onMailChange(newValue: String) { mail = newValue }
     fun guardarPerfil() { println("Guardando: $nombre") }
+    fun cerrarSesion(onSuccess: () -> Unit) {
+        // En el futuro aquí irá Firebase.auth.signOut()
+        println("Sesión cerrada")
+        onSuccess()
+    }
 }
 class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +55,7 @@ class ProfileActivity : ComponentActivity() {
 
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -133,11 +140,13 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
 
         // Botón Cerrar Sesión (Abajo con borde rojo)
         OutlinedButton(
-            onClick = { /* Lógica de logout */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp)
-                .height(56.dp),
+            onClick = {
+                viewModel.cerrarSesion {
+                    // Esto cierra la Activity y vuelve a la anterior
+                    (context as? Activity)?.finish()
+                }
+            },
+            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp).height(56.dp),
             shape = RoundedCornerShape(12.dp),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = White)
