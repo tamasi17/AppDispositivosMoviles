@@ -10,6 +10,7 @@ import androidx.compose.ui.res.painterResource
 import com.maccs.events.R
 import com.maccs.events.ui.home.HomeActivity
 import com.maccs.events.ui.event.CreateEventActivity
+import com.maccs.events.ui.fav.FavoritesActivity
 import com.maccs.events.ui.home.SearchEventActivity
 import com.maccs.events.ui.profile.ProfileActivity
 
@@ -19,6 +20,6 @@ sealed class BottomBarScreen(
 ) {
     object Home : BottomBarScreen(R.drawable.calendar_icon_svg, HomeActivity::class.java)
     object Create : BottomBarScreen(R.drawable.plus_icon_svg, CreateEventActivity::class.java)
-    object Favorites : BottomBarScreen(R.drawable.fav_icon, SearchEventActivity::class.java)
+    object Favorites : BottomBarScreen(R.drawable.fav_icon, FavoritesActivity::class.java)
     object Profile : BottomBarScreen(R.drawable.profile_icon_svg, ProfileActivity::class.java)
 }
