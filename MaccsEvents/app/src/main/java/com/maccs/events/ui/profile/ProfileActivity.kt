@@ -44,49 +44,96 @@ fun ProfileScreen() {
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Título "Mi Perfil"
         Text(
             text = "Mi Perfil",
             color = LigthPurple,
-            fontSize = 20.sp,
+            fontSize = 28.sp, // Un poco más grande para que resalte
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp)
+                .padding(top = 20.dp, bottom = 40.dp)
         )
 
-        Spacer(modifier = Modifier.height(60.dp))
-
-        // icono profile_icon_svg
+        // Imagen de perfil circular
         Box(
             modifier = Modifier
-                .size(140.dp)
-                .border(1.dp, White, CircleShape),
+                .size(160.dp)
+                .border(2.dp, White, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.profile_icon_svg),
                 contentDescription = null,
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.size(100.dp),
                 tint = White
             )
         }
 
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // Campo: Nombre
+        ProfileTextField(label = "Nombre", isEnabled = true, borderColor = LigthPurple)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo: Mail
+        ProfileTextField(label = "Mail", isEnabled = true, borderColor = Color.Gray)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo: ID (No editable)
+        ProfileTextField(label = "ID (no editable)", isEnabled = false, borderColor = Color.Gray)
+
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text("usuario@gmail.com", color = White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text("Modo: Colaborador/Usuario", color = Color.Gray, fontSize = 14.sp)
+        // Botón Guardar (Alineado a la derecha)
+        Button(
+            onClick = { /* Lógica de guardado */ },
+            modifier = Modifier
+                .align(Alignment.End)
+                .width(120.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Black),
+            shape = RoundedCornerShape(12.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
+        ) {
+            Text("Guardar", color = White)
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            onClick = { /* Logout */ },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = LigthPurple),
-            shape = RoundedCornerShape(12.dp)
+        // Botón Cerrar Sesión (Abajo con borde rojo)
+        OutlinedButton(
+            onClick = { /* Lógica de logout */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp)
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = White)
         ) {
-            Text("CERRAR SESIÓN", color = White, fontWeight = FontWeight.Bold)
+            Text("Cerrar sesión", fontSize = 18.sp)
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
     }
+}
+
+@Composable
+fun ProfileTextField(label: String, isEnabled: Boolean, borderColor: Color) {
+    OutlinedTextField(
+        value = "", // Aquí iría el estado de tu ViewModel
+        onValueChange = {},
+        enabled = isEnabled,
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(label, color = White) },
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = borderColor,
+            unfocusedBorderColor = borderColor,
+            disabledBorderColor = borderColor,
+            focusedTextColor = White,
+            unfocusedTextColor = White,
+            disabledTextColor = Color.Gray
+        )
+    )
 }
