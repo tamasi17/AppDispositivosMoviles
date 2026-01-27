@@ -28,7 +28,7 @@ class FakeDataSource : EventDataSource {
             time = "19:30",
             location = "Sala Barco",
             price = 12.5,
-            imageUrl = "https://images.unsplash.com/photo-1514525253440-b393452e3383?q=80&w=1000",
+            imageUrl = "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1000",
             shortDescription = "Música suave al aire libre.",
             longDescription = "Disfruta de una velada inolvidable...",
             isFavorite = true,
