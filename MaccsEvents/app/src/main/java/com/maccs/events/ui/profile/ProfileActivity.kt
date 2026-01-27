@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,26 +17,38 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maccs.events.R
 import com.maccs.events.ui.theme.*
 
+
+class ProfileViewModel : ViewModel() {
+    var nombre by mutableStateOf("")
+    var mail by mutableStateOf("")
+    val idNoEditable by mutableStateOf("USER-12345")
+
+    fun onNombreChange(newValue: String) { nombre = newValue }
+    fun onMailChange(newValue: String) { mail = newValue }
+    fun guardarPerfil() { println("Guardando: $nombre") }
+}
 class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Black
-            ) {
-                ProfileScreen()
+            val profileVm: ProfileViewModel = viewModel()
+            Surface(modifier = Modifier.fillMaxSize(), color = Black) {
+                ProfileScreen(profileVm) // Enviamos el VM aquí
             }
         }
     }
 }
 
+
+
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(viewModel: ProfileViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,18 +85,35 @@ fun ProfileScreen() {
         Spacer(modifier = Modifier.height(40.dp))
 
         // Campo: Nombre
-        ProfileTextField(label = "Nombre", isEnabled = true, borderColor = LigthPurple)
+        ProfileTextField(
+            label = "Nombre",
+            value = viewModel.nombre,
+            onValueChange = { viewModel.onNombreChange(it) },
+            isEnabled = true,
+            borderColor = LigthPurple
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Campo: Mail
-        ProfileTextField(label = "Mail", isEnabled = true, borderColor = Color.Gray)
+        ProfileTextField(
+            label = "Mail",
+            value = viewModel.mail,
+            onValueChange = { viewModel.onMailChange(it) },
+            isEnabled = true,
+            borderColor = Color.Gray
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Campo: ID (No editable)
-        ProfileTextField(label = "ID (no editable)", isEnabled = false, borderColor = Color.Gray)
-
+        ProfileTextField(
+            label = "ID (no editable)",
+            value = viewModel.idNoEditable,
+            onValueChange = {},
+            isEnabled = false,
+            borderColor = Color.Gray
+        )
         Spacer(modifier = Modifier.height(24.dp))
 
         // Botón Guardar (Alineado a la derecha)
@@ -119,10 +148,16 @@ fun ProfileScreen() {
 }
 
 @Composable
-fun ProfileTextField(label: String, isEnabled: Boolean, borderColor: Color) {
+fun ProfileTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isEnabled: Boolean,
+    borderColor: Color
+) {
     OutlinedTextField(
-        value = "", // Aquí iría el estado de tu ViewModel
-        onValueChange = {},
+        value = value,
+        onValueChange = onValueChange,
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth(),
         label = { Text(label, color = White) },
@@ -133,7 +168,8 @@ fun ProfileTextField(label: String, isEnabled: Boolean, borderColor: Color) {
             disabledBorderColor = borderColor,
             focusedTextColor = White,
             unfocusedTextColor = White,
-            disabledTextColor = Color.Gray
+            disabledTextColor = Color.Gray,
+            cursorColor = LigthPurple
         )
     )
 }
