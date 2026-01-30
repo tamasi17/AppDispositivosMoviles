@@ -1,17 +1,9 @@
 package com.maccs.events.ui.components
 
-import android.content.Intent
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import com.maccs.events.R
 import com.maccs.events.ui.home.HomeActivity
 import com.maccs.events.ui.event.CreateEventActivity
-import com.maccs.events.ui.fav.FavoritesActivity
-import com.maccs.events.ui.home.SearchEventActivity
+import com.maccs.events.ui.favorites.FavoritesActivity
 import com.maccs.events.ui.profile.ProfileActivity
 
 sealed class BottomBarScreen(
