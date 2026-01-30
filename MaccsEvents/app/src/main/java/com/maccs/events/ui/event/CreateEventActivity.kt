@@ -9,6 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.maccs.events.ui.theme.MaccsEventsTheme
+import com.maccs.events.ui.components.AppBottomBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.padding
 
 class CreateEventActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,11 +26,23 @@ class CreateEventActivity : ComponentActivity() {
         setContent {
             // 3. heredar los estilos correctos
             MaccsEventsTheme {
-                Surface(
+                Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.Black
-                ) {
-                    EventFormScreen(eventId = eventId)
+                    containerColor = Color.Black,
+                    bottomBar = {
+                        // añadir la barra inferior
+                        AppBottomBar()
+                    }
+                ) { innerPadding ->
+
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        color = Color.Transparent // Para que se vea el color del Scaffold
+                    ) {
+                        EventFormScreen(eventId = eventId)
+                    }
                 }
             }
         }
