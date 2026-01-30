@@ -33,6 +33,7 @@ import com.maccs.events.ui.event.CreateEventActivity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.clip
 import com.maccs.events.R
+import com.maccs.events.ui.components.AppBottomBar
 
 @Composable
 fun FavoritesScreen(modifier: Modifier = Modifier) {
@@ -226,6 +227,27 @@ fun FavoritesContentEmptyState() {
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 style = MaterialTheme.typography.bodyLarge
             )
+        }
+    }
+}
+@Preview(
+    name = "Pantalla con Barra - Claro",
+    showBackground = true
+)
+@Preview(
+    name = "Pantalla con Barra - Oscuro",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun FavoritesWithBarPreview() {
+    MaccsEventsTheme {
+        // Simulamos la estructura de la Activity dentro de la Preview
+        Scaffold(
+            bottomBar = { AppBottomBar() }
+        ) { paddingValues ->
+            // Le pasamos el padding para que la barra no tape el contenido
+            FavoritesScreen(modifier = Modifier.padding(paddingValues))
         }
     }
 }
