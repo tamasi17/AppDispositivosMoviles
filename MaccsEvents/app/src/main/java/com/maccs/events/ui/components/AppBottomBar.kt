@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.size
+import com.maccs.events.ui.theme.LigthPurple
+
 @Composable
 fun AppBottomBar() {
     val context = LocalContext.current
@@ -46,7 +48,7 @@ fun AppBottomBar() {
                             .size(40.dp)
                             .padding(horizontal = 2.dp),
                         tint = if (isSelected) {
-                            MaterialTheme.colorScheme.primary
+                            LigthPurple
                         } else {
                             if (isDark) Color.White else Color.Black
                         }
