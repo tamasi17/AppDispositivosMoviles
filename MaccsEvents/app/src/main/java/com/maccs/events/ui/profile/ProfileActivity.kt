@@ -5,6 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -31,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import android.net.Uri
+import com.maccs.events.ui.components.AppBottomBar
 
 class ProfileViewModel : ViewModel() {
     var nombre by mutableStateOf("")
@@ -54,8 +58,18 @@ class ProfileActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val profileVm: ProfileViewModel = viewModel()
-            Surface(modifier = Modifier.fillMaxSize(), color = Black) {
-                ProfileScreen(profileVm) // Enviamos el VM aquí
+            MaccsEventsTheme {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = Black,
+                    bottomBar = { AppBottomBar() }
+                ) { innerPadding ->
+                    // AHORA SÍ: pasamos el padding al modifier
+                    ProfileScreen(
+                        viewModel = profileVm,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
         }
     }
@@ -64,7 +78,8 @@ class ProfileActivity : ComponentActivity() {
 
 
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel) {
+fun ProfileScreen(viewModel: ProfileViewModel,
+                  modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
 
@@ -74,9 +89,8 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
         onResult = { uri -> viewModel.onImageSelected(uri) }
     )
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .systemBarsPadding()
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -204,15 +218,18 @@ fun ProfileTextField(
         onValueChange = onValueChange,
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(label, color = White) },
+
+        label = { Text(label) },
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = borderColor,
-            unfocusedBorderColor = borderColor,
-            disabledBorderColor = borderColor,
+            focusedBorderColor = LigthPurple,
+            unfocusedBorderColor = if (isEnabled) borderColor else Color.DarkGray,
+            disabledBorderColor = Color.DarkGray,
             focusedTextColor = White,
             unfocusedTextColor = White,
             disabledTextColor = Color.Gray,
+            focusedLabelColor = LigthPurple, // El color del texto pequeño arriba
+            unfocusedLabelColor = Color.Gray,
             cursorColor = LigthPurple
         )
     )
