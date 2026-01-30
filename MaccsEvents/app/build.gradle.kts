@@ -81,6 +81,9 @@ dependencies {
     
     //Cargador de imágenes
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    //Navegador de ViewModels para la HomePage
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7") // O la versión2.10.0 que usas
     
      // Iconos básicos
     implementation("androidx.compose.material:material-icons-core")
