@@ -88,6 +88,6 @@ dependencies {
     // Para usar Corrutinas y Flow
     implementation("androidx.room:room-ktx:$room_version")
     // Compilador para Room
-    ksp("androidx.room:room-compiler:$room_version")
+    add("ksp", "androidx.room:room-compiler:$room_version")
 
 }
