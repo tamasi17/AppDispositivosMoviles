@@ -88,4 +88,19 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("androidx.navigation:navigation-compose:2.8.5")
+
+    //Cargador de imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+
+// --- ROOM DATABASE ---
+    val room_version = "2.6.1"
+
+
+    implementation("androidx.room:room-runtime:$room_version")
+// Para usar Corrutinas y Flow
+    implementation("androidx.room:room-ktx:$room_version")
+// Compilador para Room
+    ksp("androidx.room:room-compiler:$room_version")
+
 }
