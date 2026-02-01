@@ -1,55 +1,77 @@
 package com.maccs.events.ui.favorites
 
-import androidx.compose.ui.tooling.preview.Preview
 import android.content.res.Configuration
-import androidx.compose.material3.Surface
-import com.maccs.events.ui.theme.MaccsEventsTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.isSystemInDarkTheme
-import com.maccs.events.ui.theme.LigthPurple
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.maccs.events.data.Evento
-import com.maccs.events.data.EventoRepository
-import com.maccs.events.ui.event.CreateEventActivity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.draw.clip
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maccs.events.R
-import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.data.model.Event
+import com.maccs.events.ui.components.AppBottomBar // Asegúrate de importar tu barra
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.MaccsEventsTheme
+import java.text.SimpleDateFormat
+import java.util.*
 
+// ----------------------------------------------------------------
+// 1. COMPOSABLE CON ESTADO (Stateful)
+// Este se usa en la navegación real de la app.
+// ----------------------------------------------------------------
 @Composable
-fun FavoritesScreen(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val favoritos by EventoRepository.eventosFavoritos.collectAsState()
+fun FavoritesScreen(
+    modifier: Modifier = Modifier,
+    viewModel: FavoritesViewModel = viewModel()
+) {
+    val favoritos by viewModel.uiState.collectAsState()
 
+    // Recargar al entrar
+    LaunchedEffect(Unit) {
+        viewModel.loadFavorites()
+    }
+
+    // Llamamos al contenido "tonto" (stateless) pasándole los datos
+    FavoritesContent(
+        modifier = modifier,
+        favoritos = favoritos,
+        onRemoveClick = { id -> viewModel.removeFavorite(id) },
+        onEventClick = { /* Navegación al detalle */ }
+    )
+}
+
+// ----------------------------------------------------------------
+// 2. COMPOSABLE SIN ESTADO (Stateless)
+// Este es el que recibe datos puros y funciones. ES EL QUE PREVISUALIZAMOS.
+// ----------------------------------------------------------------
+@Composable
+fun FavoritesContent(
+    modifier: Modifier = Modifier,
+    favoritos: List<Event>,
+    onRemoveClick: (String) -> Unit,
+    onEventClick: (String) -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            // CAMBIO: Ahora usa el fondo del tema (blanco en light, negro en dark)
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text(
             text = "Mis Favoritos",
-            // CAMBIO: Color morado por defecto del tema
             color = LigthPurple,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
@@ -70,8 +92,8 @@ fun FavoritesScreen(modifier: Modifier = Modifier) {
                 items(favoritos) { evento ->
                     EventoFavoritoCard(
                         evento = evento,
-                        onCardClick = { /* ... tu lógica de intent ... */ },
-                        onRemoveClick = { EventoRepository.eliminarFavorito(evento.id) }
+                        onCardClick = { onEventClick(evento.id) },
+                        onRemoveClick = { onRemoveClick(evento.id) }
                     )
                 }
             }
@@ -79,13 +101,24 @@ fun FavoritesScreen(modifier: Modifier = Modifier) {
     }
 }
 
+// ----------------------------------------------------------------
+// 3. COMPONENTE TARJETA
+// ----------------------------------------------------------------
 @Composable
-fun EventoFavoritoCard(evento: Evento, onCardClick: () -> Unit, onRemoveClick: () -> Unit) {
+fun EventoFavoritoCard(
+    evento: Event,
+    onCardClick: () -> Unit,
+    onRemoveClick: () -> Unit
+) {
     val isDark = isSystemInDarkTheme()
+
+    val fechaFormateada = remember(evento.date) {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        sdf.format(Date(evento.date))
+    }
 
     Card(
         colors = CardDefaults.cardColors(
-            // CAMBIO: Gris oscuro en modo noche, gris muy clarito en modo día
             containerColor = if (isDark) Color(0xFF1E1E1E) else Color(0xFFF5F5F5)
         ),
         shape = RoundedCornerShape(16.dp),
@@ -97,157 +130,121 @@ fun EventoFavoritoCard(evento: Evento, onCardClick: () -> Unit, onRemoveClick: (
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = evento.titulo,
-                        // CAMBIO: Texto negro en modo claro, blanco en oscuro
+                        text = evento.name,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(
                         onClick = onRemoveClick,
-                        modifier = Modifier.size(32.dp) // Aumenta el área de toque y visualización
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.fav_icon_filled),
-                            contentDescription = null,
+                            contentDescription = "Eliminar favorito",
                             modifier = Modifier.size(24.dp),
                             tint = LigthPurple
                         )
                     }
                 }
                 Text(
-                    text = evento.fecha,
+                    text = "$fechaFormateada - ${evento.time}h",
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-        }
-    }
-}
-
-@Preview(
-    name = "Pantalla Completa - Claro",
-    showBackground = true,
-    group = "Screens"
-)
-@Preview(
-    name = "Pantalla Completa - Oscuro",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    group = "Screens"
-)
-@Composable
-fun FavoritesScreenPreview() {
-    MaccsEventsTheme {
-        // Surface asegura que el fondo cambie según el modo (Blanco/Negro)
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            FavoritesScreen()
-        }
-    }
-}
-
-@Preview(
-    name = "Tarjeta Evento - Claro",
-    showBackground = true,
-    group = "Components"
-)
-@Preview(
-    name = "Tarjeta Evento - Oscuro",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    group = "Components"
-)
-@Composable
-fun EventoCardPreview() {
-    MaccsEventsTheme {
-        Surface {
-            Box(modifier = Modifier.padding(16.dp)) {
-                EventoFavoritoCard(
-                    evento = Evento(
-                        id = 1,
-                        titulo = "Concierto Rock Urbano",
-                        fecha = "15/02/2026 - 20:00h",
-                        lugar = "Sala La Riviera"
-                    ),
-                    onCardClick = {},
-                    onRemoveClick = {}
+                Text(
+                    text = evento.location,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }
     }
 }
 
-@Preview(
-    name = "Lista Vacía - Claro",
-    showBackground = true,
-    group = "Screens"
+// ----------------------------------------------------------------
+// DATOS FAKE PARA PREVIEWS (Solo se usan aquí abajo)
+// ----------------------------------------------------------------
+private val sampleEvents = listOf(
+    Event(
+        id = "1", name = "Tech Fest Madrid", date = 1710493200000L, time = "10:00",
+        location = "Campus UC3M", price = 45.0, imageUrl = "", shortDescription = "",
+        longDescription = "", isFavorite = true, isAttending = true
+    ),
+    Event(
+        id = "2", name = "Concierto Jazz", date = 1711098000000L, time = "19:30",
+        location = "Sala Clamores", price = 20.0, imageUrl = "", shortDescription = "",
+        longDescription = "", isFavorite = true, isAttending = false
+    ),
+    Event(
+        id = "3", name = "Feria del Libro", date = 1712307600000L, time = "12:00",
+        location = "El Retiro", price = 0.0, imageUrl = "", shortDescription = "",
+        longDescription = "", isFavorite = true, isAttending = false
+    )
 )
-@Preview(
-    name = "Lista Vacía - Oscuro",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    group = "Screens"
-)
+
+// ----------------------------------------------------------------
+// PREVIEWS
+// ----------------------------------------------------------------
+
+// --- GRUPO 1: TARJETAS SUELTAS ---
+@Preview(name = "Tarjeta - Claro", showBackground = true, group = "Components")
+@Preview(name = "Tarjeta - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, group = "Components")
 @Composable
-fun FavoritesEmptyPreview() {
+fun PreviewCard() {
     MaccsEventsTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            // Aquí forzamos una versión de la pantalla que no tenga datos
-            // Si usas el Repositorio, podrías simularlo o simplemente llamar
-            // a una versión del Composable que reciba una lista vacía.
-            FavoritesContentEmptyState()
-        }
-    }
-}
-
-@Composable
-fun FavoritesContentEmptyState() {
-    // Reutilizamos la estructura de tu columna pero pasando una lista vacía
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Mis Favoritos",
-            color = Color(0xFF8A2BE2), // Tu morado de proyecto
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Aún no tienes eventos favoritos",
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                style = MaterialTheme.typography.bodyLarge
+        Box(modifier = Modifier.padding(16.dp)) {
+            EventoFavoritoCard(
+                evento = sampleEvents[0],
+                onCardClick = {},
+                onRemoveClick = {}
             )
         }
     }
 }
-@Preview(
-    name = "Pantalla con Barra - Claro",
-    showBackground = true
-)
-@Preview(
-    name = "Pantalla con Barra - Oscuro",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+
+// --- GRUPO 2: PANTALLA COMPLETA (CONTENIDO) ---
+@Preview(name = "Contenido - Claro", showBackground = true, group = "Screens")
+@Preview(name = "Contenido - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, group = "Screens")
 @Composable
-fun FavoritesWithBarPreview() {
+fun PreviewFavoritesContent() {
     MaccsEventsTheme {
-        // Simulamos la estructura de la Activity dentro de la Preview
+        // Usamos FavoritesContent para poder pasarle la lista falsa manualmente
+        FavoritesContent(
+            favoritos = sampleEvents,
+            onRemoveClick = {},
+            onEventClick = {}
+        )
+    }
+}
+
+@Preview(name = "Contenido Vacío", showBackground = true, group = "Screens")
+@Composable
+fun PreviewFavoritesEmpty() {
+    MaccsEventsTheme {
+        FavoritesContent(
+            favoritos = emptyList(),
+            onRemoveClick = {},
+            onEventClick = {}
+        )
+    }
+}
+
+// --- GRUPO 3: PANTALLA COMPLETA + BARRA INFERIOR ---
+@Preview(name = "App Completa - Claro", showBackground = true, group = "App Integration")
+@Preview(name = "App Completa - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, group = "App Integration")
+@Composable
+fun PreviewWithBottomBar() {
+    MaccsEventsTheme {
         Scaffold(
-            bottomBar = { AppBottomBar() }
+            bottomBar = { AppBottomBar() } // Tu barra inferior real
         ) { paddingValues ->
-            // Le pasamos el padding para que la barra no tape el contenido
-            FavoritesScreen(modifier = Modifier.padding(paddingValues))
+            // Le pasamos el padding del Scaffold para que la lista no quede tapada por la barra
+            FavoritesContent(
+                modifier = Modifier.padding(paddingValues),
+                favoritos = sampleEvents,
+                onRemoveClick = {},
+                onEventClick = {}
+            )
         }
     }
 }
