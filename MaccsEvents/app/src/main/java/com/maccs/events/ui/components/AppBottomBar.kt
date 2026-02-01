@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.size
 import com.maccs.events.ui.theme.LigthPurple
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun AppBottomBar() {
@@ -28,7 +31,17 @@ fun AppBottomBar() {
 
     val isDark = isSystemInDarkTheme()
 
+    // Simplificamos la definición de la forma
+    val roundShape = RoundedCornerShape(20.dp)
+
     NavigationBar(
+        modifier = Modifier
+            .border(
+                width = 3.dp,
+                color = LigthPurple,
+                shape = roundShape
+            )
+            .clip(roundShape), // Ahora sin el prefijo largo "androidx..."
         containerColor = if (isDark) Color.Black else Color.White,
         tonalElevation = 0.dp
     ) {
@@ -43,7 +56,6 @@ fun AppBottomBar() {
                     Icon(
                         painter = painterResource(id = screen.icon),
                         contentDescription = null,
-                        // Iconos un poco más pequeños y con más espacio a los lados
                         modifier = Modifier
                             .size(40.dp)
                             .padding(horizontal = 2.dp),
@@ -68,6 +80,8 @@ fun AppBottomBar() {
         }
     }
 }
+
+
 
 @Preview(
     name = "Modo Claro",
