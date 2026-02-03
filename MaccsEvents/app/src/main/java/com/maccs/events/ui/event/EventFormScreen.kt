@@ -24,6 +24,9 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class) // para DatePicker y TimePicker
 @Composable
 fun EventFormScreen(eventId: String?) {
+
+    val repository = remember { com.maccs.events.data.repository.FakeDataSource() }
+
     val titleText = if (eventId == null) "Nuevo Evento" else "Editar Evento"
 
     var eventTitle by remember { mutableStateOf("") }
@@ -32,6 +35,23 @@ fun EventFormScreen(eventId: String?) {
     var price by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
+
+    LaunchedEffect(eventId) {
+        if (eventId != null) {
+            val event = repository.getEventById(eventId)
+            event?.let {
+                eventTitle = it.name
+                location = it.location
+                description = it.longDescription
+                price = it.price.toString()
+                // Formatear fecha y hora desde el Long del modelo si es necesario
+                val sdfDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                date = sdfDate.format(Date(it.date))
+                time = it.time
+            }
+        }
+    }
+
 
 
     // Para añadir imágen de la galería

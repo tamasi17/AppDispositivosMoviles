@@ -1,10 +1,12 @@
 package com.maccs.events.ui.event
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
@@ -16,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import androidx.compose.ui.platform.LocalContext
+import com.maccs.events.ui.event.CreateEventActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +28,7 @@ fun EventDetailScreen(
     viewModel: EventDetailViewModel,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     // Al iniciar, le pedimos al ViewModel que cargue el evento
     LaunchedEffect(eventId) {
         viewModel.loadEvent(eventId)
@@ -39,7 +44,19 @@ fun EventDetailScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
                     }
-                }
+                },
+                actions = {
+                    if (state is EventDetailUiState.Success) {
+                        IconButton(onClick = {
+                            val intent = Intent(context, CreateEventActivity::class.java).apply {
+                                putExtra("EVENT_ID", eventId)
+                            }
+                            context.startActivity(intent)
+                        }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Editar Evento")
+                            }
+                        }
+                    }
             )
         }
     ) { paddingValues ->

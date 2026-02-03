@@ -34,6 +34,7 @@ import coil.compose.AsyncImage
 import com.maccs.events.R
 import com.maccs.events.data.model.Event
 import com.maccs.events.data.repository.FakeDataSource
+import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.event.EventDetailScreen
 import com.maccs.events.ui.event.EventDetailViewModel
 import com.maccs.events.ui.theme.MaccsEventsTheme
@@ -144,32 +145,7 @@ class HomeActivity : ComponentActivity() {
                 )
             },
             bottomBar = {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.background
-                ) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                        label = { Text("Inicio") },
-                        selected = true,
-                        onClick = { },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black,
-                            indicatorColor = MaterialTheme.colorScheme.primary
-                        )
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.DateRange, contentDescription = "Eventos") },
-                        label = { Text("Eventos") },
-                        selected = false,
-                        onClick = { }
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
-                        label = { Text("Perfil") },
-                        selected = false,
-                        onClick = { }
-                    )
-                }
+                AppBottomBar()
             }
         ) { innerPadding ->
             // Se eliminó el Text redundante que estaba aquí para quitar el hueco
