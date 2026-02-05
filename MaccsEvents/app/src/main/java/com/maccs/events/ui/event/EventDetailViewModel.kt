@@ -1,56 +1,52 @@
 package com.maccs.events.ui.event
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.maccs.events.data.model.Event
-import com.maccs.events.data.repository.FakeDataSource
+import com.maccs.events.data.repository.EventRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-sealed interface EventDetailUiState {
-    object Loading : EventDetailUiState
-    data class Success(val event: Event) : EventDetailUiState
-    object Error : EventDetailUiState
+class EventDetailViewModel(
+    private val repository: EventRepository,
+    private val eventId: String
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<Event?>(null)
+    val uiState: StateFlow<Event?> = _uiState.asStateFlow()
+
+    init {
+        // Cargar el evento nada más iniciar
+        viewModelScope.launch {
+            val event = repository.getEventById(eventId)
+            _uiState.value = event
+        }
+    }
+
+    fun toggleFavorite() {
+        val currentEvent = _uiState.value ?: return
+        viewModelScope.launch {
+            repository.toggleFavorite(currentEvent)
+            // Recargamos el dato actualizado de la DB
+            val updatedEvent = repository.getEventById(eventId)
+            _uiState.value = updatedEvent
+        }
+    }
 }
 
-class EventDetailViewModel : ViewModel() {
-
-    private val repository = FakeDataSource()
-
-    // Este es el estado que la UI va a observar
-    var uiState: EventDetailUiState by mutableStateOf(EventDetailUiState.Loading)
-        private set
-
-    // Función para cargar el evento por ID
-    fun loadEvent(eventId: String) {
-        viewModelScope.launch {
-            uiState = EventDetailUiState.Loading
-            val event = repository.getEventById(eventId)
-            uiState = if (event != null) {
-                EventDetailUiState.Success(event)
-            } else {
-                EventDetailUiState.Error
-            }
+// --- FACTORY: Necesaria para pasar ID y Repo al ViewModel ---
+class EventDetailViewModelFactory(
+    private val repository: EventRepository,
+    private val eventId: String
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(EventDetailViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return EventDetailViewModel(repository, eventId) as T
         }
-    }
-
-    // Función para marcar/desmarcar favorito
-    fun toggleFavorite(eventId: String) {
-        viewModelScope.launch {
-            repository.toggleFavorite(eventId)
-            // Recargamos para que la UI vea el cambio
-            loadEvent(eventId)
-        }
-    }
-
-    // Función para confirmar/cancelar asistencia
-    fun toggleAttendance(eventId: String) {
-        viewModelScope.launch {
-            repository.toggleAttendance(eventId)
-            // Recargamos para que la UI vea el cambio
-            loadEvent(eventId)
-        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
