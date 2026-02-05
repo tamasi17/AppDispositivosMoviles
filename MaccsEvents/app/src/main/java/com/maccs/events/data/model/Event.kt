@@ -17,8 +17,6 @@ data class  Event(
     val imageUrl: String,
     val shortDescription: String,
     val longDescription: String,
-
-// Estados que pueden cambiar por interacción del usuario
     val isFavorite: Boolean = false,
     val isAttending: Boolean = false
 )
