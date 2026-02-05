@@ -8,7 +8,7 @@ fun EventEntity.toDomain(): Event {
     return Event(
         id = this.id,
         name = this.name,
-        date = this.date, // Si tu UI usa String, aquí tendrás que formatearlo
+        date = this.date, // TODO: UI usa String, aquí hay que formatearlo
         location = this.location,
         imageUrl = this.imageUrl,
         price = this.price,
@@ -29,6 +29,10 @@ fun Event.toEntity(): EventEntity {
         location = this.location,
         imageUrl = this.imageUrl,
         price = this.price,
-        isFavorite = this.isFavorite
+        isFavorite = this.isFavorite,
+        time = this.time,
+        shortDescription = this.shortDescription,
+        longDescription = this.longDescription,
+        isAttending = this.isAttending
     )
 }

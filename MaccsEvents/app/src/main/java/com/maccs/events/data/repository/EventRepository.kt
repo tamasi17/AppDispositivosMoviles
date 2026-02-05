@@ -1,46 +1,33 @@
 package com.maccs.events.data.repository
 
+import com.maccs.events.data.local.dao.EventDao
+import com.maccs.events.data.local.toDomain
+import com.maccs.events.data.local.toEntity
 import com.maccs.events.data.model.Event
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class EventRepository {
+class EventRepository(private val eventDao: EventDao) {
 
+    // 1. Obtener eventos (La magia del Flow: se actualiza solo si cambia la DB)
+    val events: Flow<List<Event>> = eventDao.getAllEvents().map { entities ->
+        entities.map { it.toDomain() } // Usamos el mapper aquí
+    }
 
-    /**
-     * Singleton (object) para simular inyección de dependencias simple.
-     * Esto asegura que todos los ViewModels usen LA MISMA instancia de datos
-     * (así si marcas favorito en detalle, se ve en home).
-     */
-    object EventRepository {
-
-        // --- CONFIGURACIÓN DE LA FUENTE DE DATOS ---
-
-        // AHORA (Fase 1): Usamos el Fake
-        private val dataSource: EventDataSource = FakeDataSource()
-
-        // FUTURO (Fase 2 - Room):
-        // Cuando configures Room, cambiarás la línea de arriba por algo así:
-        // private lateinit var dataSource: EventDataSource
-        // fun init(db: AppDatabase) { dataSource = RoomDataSource(db.eventDao()) }
-
-
-        // --- MÉTODOS PÚBLICOS (API) ---
-        // El ViewModel solo llama a esto, no sabe qué hay detrás.
-
-        suspend fun getEvents(): List<Event> {
-            return dataSource.getEvents()
+    fun getEvents(): Flow<List<Event>> {
+        return eventDao.getAllEvents().map { entities ->
+            entities.map { it.toDomain() }
         }
+    }
 
-        suspend fun getEventById(eventId: String): Event? {
-            return dataSource.getEventById(eventId)
-        }
+    // 2. Obtener un evento por ID
+    suspend fun getEventById(id: String): Event? {
+        return eventDao.getEventById(id)?.toDomain()
+    }
 
-        suspend fun toggleFavorite(eventId: String) {
-            dataSource.toggleFavorite(eventId)
-        }
-
-        suspend fun toggleAttendance(eventId: String) {
-            dataSource.toggleAttendance(eventId)
-        }
-
+    // 3. Toggle Favorito
+    suspend fun toggleFavorite(event: Event) {
+        val updatedEvent = event.copy(isFavorite = !event.isFavorite)
+        eventDao.update(updatedEvent.toEntity())
     }
 }

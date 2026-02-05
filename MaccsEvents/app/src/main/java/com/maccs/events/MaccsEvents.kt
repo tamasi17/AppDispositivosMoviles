@@ -3,25 +3,22 @@ package com.maccs.events
 import android.app.Application
 import androidx.room.Room
 import com.maccs.events.data.local.AppDatabase
+import com.maccs.events.data.repository.EventRepository
+
 
 class MaccsEventsApp : Application() {
 
-    // "companion object" is like "static" in Java.
-    // It allows you to access the database from ANYWHERE in your code
-    // simply by typing: MaccsEventsApp.database
-    companion object {
-        lateinit var database: AppDatabase
-    }
-
-    // onCreate runs ONLY ONCE when the app launches.
-    override fun onCreate() {
-        super.onCreate()
-
-        // We build the database here so it's ready before any screen loads.
-        database = Room.databaseBuilder(
+    // Instancia única de la base de datos
+    private val database by lazy {
+        Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java,
             "maccs-events-db"
         ).build()
+    }
+
+    // Instancia única del repositorio (Accesible desde cualquier Activity)
+    val container by lazy {
+        EventRepository(database.eventDao())
     }
 }
