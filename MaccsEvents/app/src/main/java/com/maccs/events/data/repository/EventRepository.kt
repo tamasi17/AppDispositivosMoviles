@@ -39,10 +39,14 @@ class EventRepository(private val eventDao: EventDao) {
     }
 
     suspend fun insertEvent(event: Event) {
-        eventDao.insert(event.toEntity()) // Asumiendo que tu DAO tiene @Insert
+        eventDao.insert(event.toEntity()) 
     }
 
     suspend fun updateEvent(event: Event) {
-        eventDao.update(event.toEntity()) // Asumiendo que tu DAO tiene @Update
+        eventDao.update(event.toEntity())
+    }
+
+    suspend fun deleteEvent(event: Event) {
+        eventDao.delete(event.toEntity())
     }
 }

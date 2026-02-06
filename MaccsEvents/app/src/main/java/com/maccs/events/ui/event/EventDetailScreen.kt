@@ -9,11 +9,15 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,16 +36,46 @@ fun EventDetailScreen(
     eventId: String,
     viewModel: EventDetailViewModel,
     onBack: () -> Unit,
-    onEditClick: (String) -> Unit // <--- NUEVO: Callback para editar
+    onEditClick: (String) -> Unit
 ) {
-    // Si tu ViewModel no carga en el init, usamos esto. Si ya carga en init, puedes quitarlo.
-    LaunchedEffect(eventId) {
-        // viewModel.loadEvent(eventId) // Descomenta si tu ViewModel necesita carga manual
-    }
-
-    // Convertimos el Flow a Estado de Compose para que la pantalla se redibuje sola
     val uiState by viewModel.uiState.collectAsState()
 
+    // 1. Observamos si se ha borrado para salir de la pantalla
+    val isDeleted by viewModel.isDeleted.collectAsState()
+
+    LaunchedEffect(isDeleted) {
+        if (isDeleted) {
+            onBack() // Vuelve al Home automáticamente
+        }
+    }
+
+    // Estado local para mostrar/ocultar el diálogo de confirmación
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // DIÁLOGO DE CONFIRMACIÓN
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("¿Borrar evento?") },
+            text = { Text("Esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteEvent()
+                        showDeleteDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+                ) {
+                    Text("Borrar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
     Scaffold(
         topBar = {
             TopAppBar(

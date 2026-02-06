@@ -53,6 +53,24 @@ class EventDetailViewModel(
             }
         }
     }
+
+    private val _isDeleted = MutableStateFlow(false)
+    val isDeleted = _isDeleted.asStateFlow()
+
+    // 2. FUNCIÓN DE BORRADO
+    fun deleteEvent() {
+        val currentState = _uiState.value
+        if (currentState is EventDetailUiState.Success) {
+            val eventToDelete = currentState.event
+            viewModelScope.launch {
+                repository.deleteEvent(eventToDelete)
+                // Avisamos a la UI que el borrado ha terminado
+                _isDeleted.value = true
+            }
+        }
+    }
+
+
 }
 
 // --- FACTORY: Necesaria para pasar ID y Repo al ViewModel ---
