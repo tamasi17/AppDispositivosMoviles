@@ -29,7 +29,7 @@ class CreateEventActivity : ComponentActivity() {
         // 2. Crear ViewModel
         val appContainer = (application as MaccsEventsApp).container
         val viewModel: EventFormViewModel by viewModels {
-            EventFormViewModelFactory(appContainer, eventId)
+            EventFormViewModelFactory(appContainer.eventRepository, eventId)
         }
 
         setContent {

@@ -1,24 +1,18 @@
 package com.maccs.events
 
 import android.app.Application
-import androidx.room.Room
-import com.maccs.events.data.local.AppDatabase
-import com.maccs.events.data.repository.EventRepository
-
+import com.maccs.events.data.AppContainer
+import com.maccs.events.data.DefaultAppContainer
 
 class MaccsEventsApp : Application() {
 
-    // Instancia única de la base de datos
-    private val database by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "maccs-events-db"
-        ).build()
-    }
+    // Esta variable guardará el contenedor de dependencias
+    lateinit var container: AppContainer
 
-    // Instancia única del repositorio (Accesible desde cualquier Activity)
-    val container by lazy {
-        EventRepository(database.eventDao())
+    override fun onCreate() {
+        super.onCreate()
+        // Inicializamos el contenedor
+        // Esto crea la base de datos y el repositorio
+        container = DefaultAppContainer(this)
     }
 }

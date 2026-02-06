@@ -56,7 +56,7 @@ class HomeActivity : ComponentActivity() {
 
         // Inicializamos el ViewModel usando la Factory
         val homeViewModel: HomeViewModel by viewModels {
-            HomeViewModelFactory(appContainer)
+            HomeViewModelFactory(appContainer.eventRepository)
         }
 
         setContent {
@@ -106,7 +106,7 @@ class HomeActivity : ComponentActivity() {
 
                 // 3. Creamos el ViewModel ESPECÍFICO para este ID usando la Factory
                 val detailViewModel: EventDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                    factory = EventDetailViewModelFactory(appContainer, eventId)
+                    factory = EventDetailViewModelFactory(appContainer.eventRepository, eventId)
                 )
 
                 // 4. Mostramos tu pantalla real
