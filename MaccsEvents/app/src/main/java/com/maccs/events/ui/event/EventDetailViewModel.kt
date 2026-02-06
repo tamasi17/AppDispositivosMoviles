@@ -10,29 +10,47 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+
+// 1. DEFINICIÓN DE ESTADOS (Exito, Error, Cargando)
+sealed interface EventDetailUiState {
+    object Loading : EventDetailUiState
+    data class Error(val message: String) : EventDetailUiState
+    data class Success(val event: Event) : EventDetailUiState
+}
 class EventDetailViewModel(
     private val repository: EventRepository,
     private val eventId: String
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<Event?>(null)
-    val uiState: StateFlow<Event?> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<EventDetailUiState>(EventDetailUiState.Loading)
+    val uiState: StateFlow<EventDetailUiState> = _uiState.asStateFlow()
 
     init {
-        // Cargar el evento nada más iniciar
-        viewModelScope.launch {
-            val event = repository.getEventById(eventId)
-            _uiState.value = event
-        }
+        loadEvent()
     }
 
-    fun toggleFavorite() {
-        val currentEvent = _uiState.value ?: return
+    private fun loadEvent() {
         viewModelScope.launch {
-            repository.toggleFavorite(currentEvent)
-            // Recargamos el dato actualizado de la DB
-            val updatedEvent = repository.getEventById(eventId)
-            _uiState.value = updatedEvent
+            _uiState.value = EventDetailUiState.Loading
+
+            val event = repository.getEventById(eventId)
+            if (event != null) {
+                _uiState.value = EventDetailUiState.Success(event)
+            } else {
+                _uiState.value = EventDetailUiState.Error("No se encontró el evento")
+            }
+        }
+    }
+    fun toggleFavorite() {
+        // Para acceder al evento dentro del estado Success, usamos smart cast
+        val currentState = _uiState.value
+        if (currentState is EventDetailUiState.Success) {
+            val event = currentState.event
+            viewModelScope.launch {
+                repository.toggleFavorite(event)
+                // Recargamos para actualizar la UI
+                loadEvent()
+            }
         }
     }
 }

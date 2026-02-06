@@ -79,50 +79,48 @@ class HomeActivity : ComponentActivity() {
 
         NavHost(navController = navController, startDestination = "home") {
 
-            // PANTALLA PRINCIPAL
             composable("home") {
                 HomeScreen(
                     viewModel = viewModel,
                     onEventClick = { eventId ->
-                        // Navegar al detalle pasando el ID
+                        // ¡ESTA LÍNEA ES LA QUE HACE LA MAGIA!
                         navController.navigate("detail/$eventId")
                     }
                 )
             }
 
-            // PANTALLA DE DETALLE
-            // ... dentro de NavHost ...
-
             composable(
                 route = "detail/{eventId}",
                 arguments = listOf(navArgument("eventId") { type = NavType.StringType })
             ) { backStackEntry ->
-                // 1. Recuperamos el ID de la navegación
+                // 1. Recuperamos el ID
                 val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
 
-                // 2. Obtenemos el contenedor de dependencias (para acceder a Room)
+                // 2. Obtenemos el contexto y el contenedor
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val appContainer = (context.applicationContext as MaccsEventsApp).container
 
-                // 3. Creamos el ViewModel ESPECÍFICO para este ID usando la Factory
+                // 3. Creamos el ViewModel con la Factory (Paso crítico)
+                // Asegúrate de importar: androidx.lifecycle.viewmodel.compose.viewModel
                 val detailViewModel: EventDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
                     factory = EventDetailViewModelFactory(appContainer.eventRepository, eventId)
                 )
 
-                // 4. Mostramos tu pantalla real
+                // 4. Mostramos la pantalla
                 EventDetailScreen(
                     eventId = eventId,
                     viewModel = detailViewModel,
-                    onBack = { navController.popBackStack() },
-
-                    // --- AQUÍ CONECTAMOS EL BOTÓN DE EDITAR ---
+                    onBack = { navController.popBackStack() }, // Volver atrás
                     onEditClick = { idToEdit ->
-                        val intent = Intent(this@HomeActivity, com.maccs.events.ui.event.CreateEventActivity::class.java)
-                        intent.putExtra("EVENT_ID", idToEdit) // Pasamos el ID como extra
-                        startActivity(intent)
+                        // Usamos 'context' que definimos arriba
+                        val intent = android.content.Intent(context, com.maccs.events.ui.event.CreateEventActivity::class.java)
+                        intent.putExtra("EVENT_ID", idToEdit)
+                        context.startActivity(intent)
                     }
                 )
             }
+
+
         }
     }
 

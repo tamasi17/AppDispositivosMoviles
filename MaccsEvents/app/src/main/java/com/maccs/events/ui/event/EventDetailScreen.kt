@@ -24,12 +24,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
-// Definimos los estados posibles de la UI (por si no tienes este archivo creado)
-sealed interface EventDetailUiState {
-    object Loading : EventDetailUiState
-    data class Error(val message: String) : EventDetailUiState
-    data class Success(val event: com.maccs.events.data.model.Event) : EventDetailUiState
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
