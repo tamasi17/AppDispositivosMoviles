@@ -95,6 +95,15 @@ fun EventDetailScreen(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
+
+                        // 2.  BOTÓN BORRAR
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Borrar evento",
+                                tint = Color.Red // Opcional: ponerlo rojo para avisar
+                            )
+                        }
                     }
                 }
             )
