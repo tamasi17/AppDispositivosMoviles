@@ -31,6 +31,13 @@ class EventRepository(private val eventDao: EventDao) {
         eventDao.update(updatedEvent.toEntity())
     }
 
+    // In EventRepository.kt
+    fun getFavoriteEvents(): Flow<List<Event>> {
+        return eventDao.getFavoriteEvents().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
     suspend fun insertEvent(event: Event) {
         eventDao.insert(event.toEntity()) // Asumiendo que tu DAO tiene @Insert
     }

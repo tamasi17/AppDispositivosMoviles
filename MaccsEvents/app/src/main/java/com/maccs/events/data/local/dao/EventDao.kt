@@ -37,4 +37,8 @@ interface EventDao {
     // 4. BORRAR
     @Delete
     suspend fun delete(event: EventEntity)
+
+    // 5. FAVS
+    @Query("SELECT * FROM events WHERE isFavorite = 1 ORDER BY date DESC")
+    fun getFavoriteEvents(): Flow<List<EventEntity>>
 }
