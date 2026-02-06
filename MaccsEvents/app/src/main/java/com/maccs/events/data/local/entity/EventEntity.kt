@@ -14,7 +14,6 @@ data class EventEntity(
     val id: String,
     val name: String,
     val date: Long, // Stored as a timestamp (Long) for efficient sorting
-    val time: String, // TODO: cambiar a DateTime?
     val location: String,
     val imageUrl: String,
     val price: Double,

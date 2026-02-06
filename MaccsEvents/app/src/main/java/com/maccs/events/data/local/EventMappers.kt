@@ -13,7 +13,6 @@ fun EventEntity.toDomain(): Event {
         imageUrl = this.imageUrl,
         price = this.price,
         isFavorite = this.isFavorite,
-        time = this.time,
         shortDescription = this.shortDescription,
         longDescription = this.longDescription,
         isAttending = this.isAttending
@@ -30,7 +29,6 @@ fun Event.toEntity(): EventEntity {
         imageUrl = this.imageUrl,
         price = this.price,
         isFavorite = this.isFavorite,
-        time = this.time,
         shortDescription = this.shortDescription,
         longDescription = this.longDescription,
         isAttending = this.isAttending

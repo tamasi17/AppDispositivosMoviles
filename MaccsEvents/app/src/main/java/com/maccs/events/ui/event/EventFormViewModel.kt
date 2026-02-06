@@ -71,7 +71,6 @@ class EventFormViewModel(
                     price = currentState.price.toDoubleOrNull() ?: 0.0,
                     imageUrl = currentState.imageUrl.ifBlank { "https://picsum.photos/seed/${System.currentTimeMillis()}/400/200" }, // Imagen random si no hay
                     date = System.currentTimeMillis(), // Fecha actual por defecto
-                    time = System.currentTimeMillis(),
                     shortDescription = currentState.description.take(50),
                     longDescription = currentState.description,
                     isFavorite = false
