@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.map
 
 class EventRepository(private val eventDao: EventDao) {
 
-    // 1. Obtener eventos (La magia del Flow: se actualiza solo si cambia la DB)
-    val events: Flow<List<Event>> = eventDao.getAllEvents().map { entities ->
-        entities.map { it.toDomain() } // Usamos el mapper aquí
-    }
+//    // 1. Obtener eventos (La magia del Flow: se actualiza solo si cambia la DB)
+//    val events: Flow<List<Event>> = eventDao.getAllEvents().map { entities ->
+//        entities.map { it.toDomain() } // Usamos el mapper aquí
+//    }
 
     fun getEvents(): Flow<List<Event>> {
         return eventDao.getAllEvents().map { entities ->
@@ -29,5 +29,13 @@ class EventRepository(private val eventDao: EventDao) {
     suspend fun toggleFavorite(event: Event) {
         val updatedEvent = event.copy(isFavorite = !event.isFavorite)
         eventDao.update(updatedEvent.toEntity())
+    }
+
+    suspend fun insertEvent(event: Event) {
+        eventDao.insert(event.toEntity()) // Asumiendo que tu DAO tiene @Insert
+    }
+
+    suspend fun updateEvent(event: Event) {
+        eventDao.update(event.toEntity()) // Asumiendo que tu DAO tiene @Update
     }
 }

@@ -33,4 +33,6 @@ interface EventDao {
     // Updates a specific event. Used primarily for toggling 'isFavorite'.
     @Update
     suspend fun update(event: EventEntity)
+
+
 }

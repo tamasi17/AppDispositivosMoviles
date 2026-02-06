@@ -36,6 +36,7 @@ import com.maccs.events.MaccsEventsApp
 import com.maccs.events.R
 import com.maccs.events.data.model.Event
 import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.event.EventDetailScreen
 import com.maccs.events.ui.event.EventDetailViewModel
 import com.maccs.events.ui.event.EventDetailViewModelFactory
 import com.maccs.events.ui.theme.MaccsEventsTheme
@@ -112,7 +113,14 @@ class HomeActivity : ComponentActivity() {
                 EventDetailScreen(
                     eventId = eventId,
                     viewModel = detailViewModel,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+
+                    // --- AQUÍ CONECTAMOS EL BOTÓN DE EDITAR ---
+                    onEditClick = { idToEdit ->
+                        val intent = Intent(this@HomeActivity, com.maccs.events.ui.event.CreateEventActivity::class.java)
+                        intent.putExtra("EVENT_ID", idToEdit) // Pasamos el ID como extra
+                        startActivity(intent)
+                    }
                 )
             }
         }
