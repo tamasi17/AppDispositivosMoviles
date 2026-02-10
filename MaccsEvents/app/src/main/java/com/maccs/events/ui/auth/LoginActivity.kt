@@ -44,6 +44,10 @@ class LoginActivity : ComponentActivity() {
                 // Definimos qué pasa cuando el usuario pulsa el botón en la UI
                 onLoginClick = { emailInput, passwordInput ->
                     realizarLoginEnFirebase(emailInput, passwordInput)
+                },onRegisterClick = {
+                    // Creamos el Intent para ir a RegisterActivity
+                    val intent = Intent(this, RegisterActivity::class.java)
+                    startActivity(intent)
                 }
             )
         }
@@ -72,7 +76,8 @@ class LoginActivity : ComponentActivity() {
 }
 
 @Composable
-fun LoginScreen(onLoginClick: (String, String) -> Unit) {
+fun LoginScreen(onLoginClick: (String, String) -> Unit,
+                onRegisterClick: () -> Unit) {
     // 2. Gestión de Estado (State)
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -161,7 +166,7 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         // texto debajo del botón de entrar
-        TextButton(onClick = { /* Pendiente: Registro */ }) {
+        TextButton(onClick = { onRegisterClick()}) {
             Text(
                 text = "¿No tienes cuenta? Regístrate",
                 color = White.copy(alpha = 0.7f),
