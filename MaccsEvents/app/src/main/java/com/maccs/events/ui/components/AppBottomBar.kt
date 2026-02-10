@@ -31,17 +31,17 @@ fun AppBottomBar() {
 
     val isDark = isSystemInDarkTheme()
 
-    // Simplificamos la definición de la forma
-    val roundShape = RoundedCornerShape(20.dp)
+    val barShape = RoundedCornerShape(20.dp)
 
     NavigationBar(
         modifier = Modifier
+            .padding(8.dp) // Añadimos padding para que se vea el redondeado inferior
             .border(
-                width = 3.dp,
+                width = 2.dp,
                 color = LigthPurple,
-                shape = roundShape
+                shape = barShape    // <--- ESTO REDONDEA EL BORDE
             )
-            .clip(roundShape), // Ahora sin el prefijo largo "androidx..."
+            .clip(barShape),        // <--- ESTO REDONDEA EL CONTENIDO/FONDO
         containerColor = if (isDark) Color.Black else Color.White,
         tonalElevation = 0.dp
     ) {
@@ -85,22 +85,14 @@ fun AppBottomBar() {
 
 @Preview(
     name = "Modo Claro",
-    showBackground = true
 )
 @Preview(
     name = "Modo Oscuro",
-    showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun AppBottomBarPreview() {
-    // Ya no necesitas crear el navController aquí
     MaccsEventsTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            // Llama a la función sin pasarle ningún parámetro
-            AppBottomBar()
-        }
+        AppBottomBar()
     }
 }
