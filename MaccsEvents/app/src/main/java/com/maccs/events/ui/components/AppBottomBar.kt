@@ -11,10 +11,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.res.painterResource
 import android.content.Intent
+import androidx.compose.foundation.border
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import com.maccs.events.ui.theme.LigthPurple
 import com.maccs.events.ui.navigation.NavigationItem
 
@@ -30,7 +33,17 @@ fun AppBottomBar() {
 
     val isDark = isSystemInDarkTheme()
 
+    val barShape = RoundedCornerShape(20.dp)
+
     NavigationBar(
+        modifier = Modifier
+            .padding(8.dp) // Añadimos padding para que se vea el redondeado inferior
+            .border(
+                width = 2.dp,
+                color = LigthPurple,
+                shape = barShape    // <--- ESTO REDONDEA EL BORDE
+            )
+            .clip(barShape),        // <--- ESTO REDONDEA EL CONTENIDO/FONDO
         containerColor = if (isDark) Color.Black else Color.White,
         tonalElevation = 0.dp
     ) {
