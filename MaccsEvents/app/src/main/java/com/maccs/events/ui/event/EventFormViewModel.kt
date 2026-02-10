@@ -76,8 +76,9 @@ class EventFormViewModel(
                     id = UUID.randomUUID().toString(),
                     name = s.name,
                     location = s.location,
-                    date = s.date, // Asumiendo que s.date tiene el valor del DatePicker
-                    description = s.description,
+                    date = System.currentTimeMillis(),
+                    shortDescription = s.description.take(50),
+                    longDescription = s.description,
                     price = s.price.toDoubleOrNull() ?: 0.0,
                     // Si no hay foto, ponemos una aleatoria de Lorem Picsum
                     imageUrl = s.imageUrl.ifBlank { "https://picsum.photos/400/200" },
@@ -96,8 +97,9 @@ class EventFormViewModel(
                     val eventToUpdate = event.copy(
                         name = s.name,
                         location = s.location,
-                        date = s.date,
-                        description = s.description,
+                        date = System.currentTimeMillis(),
+                        shortDescription = s.description.take(50),
+                        longDescription = s.description,
                         price = s.price.toDoubleOrNull() ?: 0.0,
                         imageUrl = s.imageUrl.ifBlank { event.imageUrl } // Mantenemos la foto anterior si está vacía
                         // IMPORTANTE: No cambiamos el 'userId' al editar.
