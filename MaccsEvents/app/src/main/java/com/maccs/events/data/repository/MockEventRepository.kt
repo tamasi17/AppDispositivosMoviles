@@ -2,6 +2,8 @@ package com.maccs.events.data.repository
 
 import com.maccs.events.data.model.Event
 
+/* Deprecated, kept here for teachers reference.
+
 class MockEventRepository {
 
 
@@ -44,3 +46,5 @@ class MockEventRepository {
 
     }
 }
+
+ */
