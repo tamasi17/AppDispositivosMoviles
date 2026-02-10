@@ -22,7 +22,7 @@ import com.maccs.events.MaccsEventsApp
 import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.home.EventCard // Reusing your existing component
 import com.maccs.events.ui.theme.MaccsEventsTheme
-
+import com.maccs.events.ui.theme.LigthPurple
 class FavoritesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,11 +48,12 @@ class FavoritesActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Mis Favoritos", fontWeight = FontWeight.Bold) },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground
-                    )
+                    title = {
+                        Text(
+                            "Mis Favoritos",
+                            style = MaterialTheme.typography.titleLarge.copy(color = LigthPurple)
+                        )
+                    }
                 )
             },
             bottomBar = { AppBottomBar() }
