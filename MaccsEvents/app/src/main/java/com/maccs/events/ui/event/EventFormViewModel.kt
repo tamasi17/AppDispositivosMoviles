@@ -63,30 +63,51 @@ class EventFormViewModel(
     }
     fun saveEvent() {
         val s = _uiState.value
+
         viewModelScope.launch {
+            // 1. Obtener el Usuario (Lógica de Firebase)
+            // Usamos un ID temporal si el login aún no está listo
+            val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+            val currentUserId = currentUser?.uid ?: "usuario_temporal_pruebas"
+
             if (eventId == null) {
+                // --- CASO 1: CREAR NUEVO EVENTO ---
                 val newEvent = Event(
                     id = UUID.randomUUID().toString(),
                     name = s.name,
                     location = s.location,
+                    date = s.date, // Asumiendo que s.date tiene el valor del DatePicker
+                    description = s.description,
                     price = s.price.toDoubleOrNull() ?: 0.0,
+                    // Si no hay foto, ponemos una aleatoria de Lorem Picsum
                     imageUrl = s.imageUrl.ifBlank { "https://picsum.photos/400/200" },
-                    date = System.currentTimeMillis(),
-                    shortDescription = s.description.take(50),
-                    longDescription = s.description,
-                    isFavorite = false
+                    isFavorite = false,
+                    userId = currentUserId // <--- ASIGNAMOS EL DUEÑO AQUÍ
                 )
                 repository.insertEvent(newEvent)
+
             } else {
-                repository.getEventById(eventId)?.let {
-                    repository.updateEvent(it.copy(
+                // --- CASO 2: EDITAR EVENTO EXISTENTE ---
+                // Primero recuperamos el evento original para no perder su ID ni su userId original
+                val existingEvent = repository.getEventById(eventId)
+
+                existingEvent?.let { event ->
+                    // Creamos una copia con los datos nuevos del formulario
+                    val eventToUpdate = event.copy(
                         name = s.name,
                         location = s.location,
+                        date = s.date,
+                        description = s.description,
                         price = s.price.toDoubleOrNull() ?: 0.0,
-                        longDescription = s.description
-                    ))
+                        imageUrl = s.imageUrl.ifBlank { event.imageUrl } // Mantenemos la foto anterior si está vacía
+                        // IMPORTANTE: No cambiamos el 'userId' al editar.
+                        // El evento sigue perteneciendo a quien lo creó.
+                    )
+                    repository.updateEvent(eventToUpdate)
                 }
             }
+
+            // 3. Avisar a la UI que hemos terminado
             _uiState.update { it.copy(isSaved = true) }
         }
     }
