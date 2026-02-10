@@ -11,38 +11,40 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-// Estado del formulario
 data class EventFormUiState(
     val name: String = "",
     val location: String = "",
+    val date: String = "",
+    val time: String = "",
     val price: String = "",
     val description: String = "",
-    val imageUrl: String = "", // URL por defecto o vacía
-    val isSaved: Boolean = false, // Para saber cuándo cerrar la pantalla
-    val isValid: Boolean = false
+    val imageUrl: String = "",
+    val isEditing: Boolean = false,
+    val isSaved: Boolean = false
 )
 
 class EventFormViewModel(
     private val repository: EventRepository,
-    private val eventId: String? // Si es null = Crear nuevo. Si tiene valor = Editar.
+    private val eventId: String?
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EventFormUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
+        _uiState.update { it.copy(isEditing = eventId != null) }
         if (eventId != null) {
-            // MODO EDICIÓN: Cargar datos existentes
             viewModelScope.launch {
                 val event = repository.getEventById(eventId)
-                if (event != null) {
+                event?.let { e ->
                     _uiState.update {
                         it.copy(
-                            name = event.name,
-                            location = event.location,
-                            price = event.price.toString(),
-                            description = event.longDescription, // O shortDescription
-                            imageUrl = event.imageUrl
+                            name = e.name,
+                            location = e.location,
+                            price = e.price.toString(),
+                            description = e.longDescription,
+                            imageUrl = e.imageUrl,
+                            date = "01/01/2026" // Valor por defecto o extraído de e.date
                         )
                     }
                 }
@@ -50,62 +52,51 @@ class EventFormViewModel(
         }
     }
 
-    fun onNameChange(newValue: String) { _uiState.update { it.copy(name = newValue) } }
-    fun onLocationChange(newValue: String) { _uiState.update { it.copy(location = newValue) } }
-    fun onPriceChange(newValue: String) { _uiState.update { it.copy(price = newValue) } }
-    fun onDescriptionChange(newValue: String) { _uiState.update { it.copy(description = newValue) } }
-
+    fun onNameChange(n: String) = _uiState.update { it.copy(name = n) }
+    fun onLocationChange(l: String) = _uiState.update { it.copy(location = l) }
+    fun onDateChange(d: String) = _uiState.update { it.copy(date = d) }
+    fun onTimeChange(t: String) = _uiState.update { it.copy(time = t) }
+    fun onPriceChange(p: String) = _uiState.update { it.copy(price = p) }
+    fun onDescriptionChange(d: String) = _uiState.update { it.copy(description = d) }
+    fun onImageUrlChange(url: String) {
+        _uiState.update { it.copy(imageUrl = url) }
+    }
     fun saveEvent() {
-        val currentState = _uiState.value
-
-        // Validación básica
-        if (currentState.name.isBlank() || currentState.location.isBlank()) return
-
+        val s = _uiState.value
         viewModelScope.launch {
             if (eventId == null) {
-                // --- CREAR NUEVO ---
                 val newEvent = Event(
-                    id = UUID.randomUUID().toString(), // Generar ID único
-                    name = currentState.name,
-                    location = currentState.location,
-                    price = currentState.price.toDoubleOrNull() ?: 0.0,
-                    imageUrl = currentState.imageUrl.ifBlank { "https://picsum.photos/seed/${System.currentTimeMillis()}/400/200" }, // Imagen random si no hay
-                    date = System.currentTimeMillis(), // Fecha actual por defecto
-                    shortDescription = currentState.description.take(50),
-                    longDescription = currentState.description,
+                    id = UUID.randomUUID().toString(),
+                    name = s.name,
+                    location = s.location,
+                    price = s.price.toDoubleOrNull() ?: 0.0,
+                    imageUrl = s.imageUrl.ifBlank { "https://picsum.photos/400/200" },
+                    date = System.currentTimeMillis(),
+                    shortDescription = s.description.take(50),
+                    longDescription = s.description,
                     isFavorite = false
                 )
                 repository.insertEvent(newEvent)
             } else {
-                // --- ACTUALIZAR EXISTENTE ---
-                // Primero recuperamos el original para no perder datos como la fecha o favoritos
-                val originalEvent = repository.getEventById(eventId)
-                if (originalEvent != null) {
-                    val updatedEvent = originalEvent.copy(
-                        name = currentState.name,
-                        location = currentState.location,
-                        price = currentState.price.toDoubleOrNull() ?: 0.0,
-                        longDescription = currentState.description
-                    )
-                    repository.updateEvent(updatedEvent)
+                repository.getEventById(eventId)?.let {
+                    repository.updateEvent(it.copy(
+                        name = s.name,
+                        location = s.location,
+                        price = s.price.toDoubleOrNull() ?: 0.0,
+                        longDescription = s.description
+                    ))
                 }
             }
-            // Avisar a la UI que ya hemos guardado
             _uiState.update { it.copy(isSaved = true) }
         }
     }
 }
 
-// Factory para inyectar Repository y ID
 class EventFormViewModelFactory(
     private val repository: EventRepository,
     private val eventId: String?
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(EventFormViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return EventFormViewModel(repository, eventId) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        return EventFormViewModel(repository, eventId) as T
     }
 }
