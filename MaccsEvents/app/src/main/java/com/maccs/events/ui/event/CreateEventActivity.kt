@@ -23,10 +23,7 @@ class CreateEventActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // 1. Recuperar ID
         val eventId = intent.getStringExtra("EVENT_ID")
-
-        // 2. Crear ViewModel
         val appContainer = (application as MaccsEventsApp).container
         val viewModel: EventFormViewModel by viewModels {
             EventFormViewModelFactory(appContainer.eventRepository, eventId)
@@ -34,7 +31,6 @@ class CreateEventActivity : ComponentActivity() {
 
         setContent {
             MaccsEventsTheme {
-                // Observar si se ha guardado para cerrar
                 val state by viewModel.uiState.collectAsState()
                 LaunchedEffect(state.isSaved) {
                     if (state.isSaved) finish()
@@ -45,14 +41,10 @@ class CreateEventActivity : ComponentActivity() {
                     containerColor = Color.Black,
                     bottomBar = { AppBottomBar() }
                 ) { innerPadding ->
-
                     Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
+                        modifier = Modifier.fillMaxSize().padding(innerPadding),
                         color = Color.Transparent
                     ) {
-
                         EventFormScreen(viewModel = viewModel)
                     }
                 }
