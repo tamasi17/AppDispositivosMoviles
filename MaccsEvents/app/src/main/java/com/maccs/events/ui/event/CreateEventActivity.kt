@@ -17,7 +17,8 @@ import androidx.compose.ui.graphics.Color
 import com.maccs.events.MaccsEventsApp
 import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.theme.MaccsEventsTheme
-
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 class CreateEventActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +30,12 @@ class CreateEventActivity : ComponentActivity() {
             EventFormViewModelFactory(appContainer.eventRepository, eventId)
         }
 
+        val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            // Si el usuario selecciona una imagen, guardamos su URI en el ViewModel
+            if (uri != null) {
+                viewModel.onImageUrlChange(uri.toString())
+            }
+        }
         setContent {
             MaccsEventsTheme {
                 val state by viewModel.uiState.collectAsState()
@@ -44,8 +51,15 @@ class CreateEventActivity : ComponentActivity() {
                     Surface(
                         modifier = Modifier.fillMaxSize().padding(innerPadding),
                         color = Color.Transparent
+
                     ) {
-                        EventFormScreen(viewModel = viewModel)
+                        EventFormScreen(
+                            viewModel = viewModel,
+                            onPickImage = {
+                                // Esta línea lanza el selector de fotos oficial de Android
+                                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            }
+                        )
                     }
                 }
             }

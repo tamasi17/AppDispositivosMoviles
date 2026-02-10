@@ -18,11 +18,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import androidx.compose.ui.platform.LocalContext
+import java.util.*
+import androidx.compose.foundation.clickable
 
 @Composable
-fun EventFormScreen(viewModel: EventFormViewModel) {
+fun EventFormScreen(viewModel: EventFormViewModel,
+                    onPickImage: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
 
     Column(
         modifier = Modifier
@@ -65,18 +73,59 @@ fun EventFormScreen(viewModel: EventFormViewModel) {
 
         // Fila Fecha y Hora
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            CustomTextField(
-                value = state.date,
-                onValueChange = { viewModel.onDateChange(it) },
-                label = "dd/MM/yyyy",
-                modifier = Modifier.weight(2f)
-            )
-            CustomTextField(
-                value = state.time,
-                onValueChange = { viewModel.onTimeChange(it) },
-                label = "Hora",
-                modifier = Modifier.weight(1f)
-            )
+
+            // Selector de Fecha
+            Box(modifier = Modifier.weight(2f)) {
+                CustomTextField(
+                    value = state.date,
+                    onValueChange = { },
+                    label = "dd/MM/yyyy",
+                    readOnly = true
+                )
+                // Capa clicable encima
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable {
+                            DatePickerDialog(
+                                context,
+                                { _, year, month, day ->
+                                    // Formateamos con %02d para que siempre tenga 2 dígitos (ej: 05/09/2026)
+                                    val dateFormatted = String.format("%02d/%02d/%04d", day, month + 1, year)
+                                    viewModel.onDateChange(dateFormatted)
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH)
+                            ).show()
+                        }
+                )
+            }
+
+            // Selector de Hora
+            Box(modifier = Modifier.weight(1f)) {
+                CustomTextField(
+                    value = state.time,
+                    onValueChange = { },
+                    label = "Hora",
+                    readOnly = true
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable {
+                            TimePickerDialog(
+                                context,
+                                { _, hour, minute ->
+                                    viewModel.onTimeChange(String.format("%02d:%02d", hour, minute))
+                                },
+                                calendar.get(Calendar.HOUR_OF_DAY),
+                                calendar.get(Calendar.MINUTE),
+                                true
+                            ).show()
+                        }
+                )
+            }
         }
 
         // Campo Descripción
@@ -90,14 +139,10 @@ fun EventFormScreen(viewModel: EventFormViewModel) {
 
         // Fila Imagen y Precio
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            // Unimos el diseño con la lógica de click y el texto dinámico
             CustomButtonField(
-                text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen lista!",
+                text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen seleccionada!",
                 modifier = Modifier.weight(1f),
-                onClick = {
-                    // Simulamos que se añade la URL
-                    viewModel.onImageUrlChange("https://picsum.photos/400/200")
-                }
+                onClick = { onPickImage() } // <-- Ahora llama a la galería real
             )
 
             CustomTextField(
@@ -137,11 +182,13 @@ fun CustomTextField(
     modifier: Modifier = Modifier,
     borderColor: Color = Color.Gray.copy(alpha = 0.5f),
     keyboardType: KeyboardType = KeyboardType.Text,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    readOnly: Boolean = false // Añadimos este parámetro
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
+        readOnly = readOnly, // Aplicamos el readOnly aquí
         placeholder = { Text(label, color = Color.Gray) },
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
