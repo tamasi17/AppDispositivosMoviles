@@ -90,7 +90,16 @@ fun EventFormScreen(viewModel: EventFormViewModel) {
 
         // Fila Imagen y Precio
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            CustomButtonField(text = "Imagen", modifier = Modifier.weight(1f))
+            // Unimos el diseño con la lógica de click y el texto dinámico
+            CustomButtonField(
+                text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen lista!",
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    // Simulamos que se añade la URL
+                    viewModel.onImageUrlChange("https://picsum.photos/400/200")
+                }
+            )
+
             CustomTextField(
                 value = state.price,
                 onValueChange = { viewModel.onPriceChange(it) },
@@ -99,6 +108,8 @@ fun EventFormScreen(viewModel: EventFormViewModel) {
                 keyboardType = KeyboardType.Number
             )
         }
+
+
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -146,8 +157,13 @@ fun CustomTextField(
 }
 
 @Composable
-fun CustomButtonField(text: String, modifier: Modifier = Modifier) {
+fun CustomButtonField(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {} // Añadimos el parámetro onClick
+) {
     OutlinedCard(
+        onClick = onClick, // Ahora el Card reacciona al click
         modifier = modifier.height(56.dp),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f)),

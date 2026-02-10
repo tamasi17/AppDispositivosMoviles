@@ -58,7 +58,9 @@ class EventFormViewModel(
     fun onTimeChange(t: String) = _uiState.update { it.copy(time = t) }
     fun onPriceChange(p: String) = _uiState.update { it.copy(price = p) }
     fun onDescriptionChange(d: String) = _uiState.update { it.copy(description = d) }
-
+    fun onImageUrlChange(url: String) {
+        _uiState.update { it.copy(imageUrl = url) }
+    }
     fun saveEvent() {
         val s = _uiState.value
         viewModelScope.launch {
