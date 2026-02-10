@@ -43,7 +43,9 @@ import com.maccs.events.ui.theme.MaccsEventsTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
+import androidx.compose.ui.unit.sp
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
 class HomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -154,7 +156,13 @@ class HomeActivity : ComponentActivity() {
                                 )
                             )
                         } else {
-                            Text("PRÓXIMOS EVENTOS", fontWeight = FontWeight.ExtraBold)
+                            Text("PRÓXIMOS EVENTOS",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontFamily = NunitoFamily,
+                                    color = _root_ide_package_.com.maccs.events.ui.theme.LigthPurple,
+                                    fontSize = 24.sp
+                                )
+                            )
                         }
                     },
                     actions = {
@@ -166,7 +174,7 @@ class HomeActivity : ComponentActivity() {
                                     painter = painterResource(id = R.drawable.search_icon_svg),
                                     contentDescription = "Buscar",
                                     modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = LigthPurple
                                 )
                             }
                         }
