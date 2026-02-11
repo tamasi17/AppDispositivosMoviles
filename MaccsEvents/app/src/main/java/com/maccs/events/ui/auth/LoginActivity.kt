@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -171,5 +172,33 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit) {
                 fontFamily = NunitoFamily
             )
         }
+    }
+}
+
+// --- PREVIEWS PARA LOGIN ---
+
+@Preview(showBackground = true, name = "Login - Vista Estándar")
+@Composable
+fun PreviewLoginScreen() {
+    MaccsEventsTheme(darkTheme = true) {
+        // Envolvemos en una Surface negra para que la preview no salga blanca
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Black // Asegúrate de que 'Black' esté definido en Color.kt o usa Color.Black
+        ) {
+            LoginScreen(onLoginClick = { _, _ -> })
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    name = "Login - Modo Noche Real",
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun PreviewLoginDarkMode() {
+    MaccsEventsTheme(darkTheme = true) {
+        LoginScreen(onLoginClick = { _, _ -> })
     }
 }
