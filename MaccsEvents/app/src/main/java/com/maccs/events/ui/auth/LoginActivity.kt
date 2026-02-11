@@ -88,9 +88,11 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit) {
 
         Text(
             text = "INICIAR SESIÓN",
-            color = LigthPurple,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = NunitoFamily,
+                fontSize = 26.sp,
+                color = LigthPurple
+            )
         )
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -99,7 +101,7 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email", color = White.copy(alpha = 0.5f)) },
+            label = { Text("Email", color = White.copy(alpha = 0.5f), fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -118,7 +120,7 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña", color = White.copy(alpha = 0.5f)) },
+            label = { Text("Contraseña", color = White.copy(alpha = 0.5f), fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(), // Oculta caracteres (****)
@@ -153,8 +155,8 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit) {
         ) {
             Text(
                 text = "ENTRAR",
+                fontFamily = NunitoFamily,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
             )
         }
 
@@ -165,7 +167,8 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit) {
             Text(
                 text = "¿No tienes cuenta? Regístrate",
                 color = White.copy(alpha = 0.7f),
-                fontSize = 14.sp
+                fontSize = 14.sp,
+                fontFamily = NunitoFamily
             )
         }
     }
