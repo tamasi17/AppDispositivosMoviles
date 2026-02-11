@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.ui.text.TextStyle
 import com.maccs.events.ui.components.AppBottomBar
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -55,6 +56,7 @@ class ProfileViewModel : ViewModel() {
     }
 }
 class ProfileActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -64,9 +66,27 @@ class ProfileActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Black,
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "Mi Perfil",
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontFamily = NunitoFamily,
+                                        color = LigthPurple,
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = Black,
+                                titleContentColor = LigthPurple
+                            )
+                        )
+                    },
                     bottomBar = { AppBottomBar() }
                 ) { innerPadding ->
-                    // AHORA SÍ: pasamos el padding al modifier
                     ProfileScreen(
                         viewModel = profileVm,
                         modifier = Modifier.padding(innerPadding)
@@ -77,8 +97,6 @@ class ProfileActivity : ComponentActivity() {
     }
 }
 
-
-
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
@@ -86,37 +104,28 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
 
-
-    // código que abre la galeria para añadir foto
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> viewModel.onImageSelected(uri) }
     )
+
+    // Usamos una Column con scroll por si los campos no caben en pantallas pequeñas
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .background(Black),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Título "Mi Perfil"
-        Text(
-            text = "Mi Perfil",
-            color = LigthPurple,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 48.dp, bottom = 32.dp)
-        )
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Imagen de perfil circular
         Box(
             modifier = Modifier
                 .size(160.dp)
-                .clip(CircleShape) // Corta la imagen en círculo
+                .clip(CircleShape)
                 .border(2.dp, White, CircleShape)
                 .clickable {
-                    // Al pulsar, abrimos la galería (solo imágenes)
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
@@ -124,7 +133,6 @@ fun ProfileScreen(
             contentAlignment = Alignment.Center
         ) {
             if (viewModel.imageUri != null) {
-                // Si hay una imagen seleccionada, la mostramos con Coil
                 AsyncImage(
                     model = viewModel.imageUri,
                     contentDescription = null,
@@ -132,7 +140,6 @@ fun ProfileScreen(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // Si no, mostramos el icono por defecto
                 Icon(
                     painter = painterResource(id = R.drawable.profile_icon_svg),
                     contentDescription = null,
@@ -144,7 +151,6 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Campo: Nombre
         ProfileTextField(
             label = "Nombre",
             value = viewModel.nombre,
@@ -155,9 +161,8 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: Mail
         ProfileTextField(
-            label = "Mail",
+            label = "Email",
             value = viewModel.mail,
             onValueChange = { viewModel.onMailChange(it) },
             isEnabled = true,
@@ -166,7 +171,6 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: ID (No editable)
         ProfileTextField(
             label = "ID (no editable)",
             value = viewModel.idNoEditable,
@@ -174,37 +178,41 @@ fun ProfileScreen(
             isEnabled = false,
             borderColor = Color.Gray
         )
+
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botón Guardar (Alineado a la derecha)
         Button(
-            onClick = { /* Lógica de guardado */ },
+            onClick = { viewModel.guardarPerfil() },
             modifier = Modifier
                 .align(Alignment.End)
-                .width(120.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Black),
+                .width(130.dp)
+                .height(45.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = LigthPurple,
+                contentColor = Black
+            ),
             shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
         ) {
-            Text("Guardar", color = White)
+            Text("GUARDAR", style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold))
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Botón Cerrar Sesión (Abajo con borde rojo)
         OutlinedButton(
             onClick = {
                 viewModel.cerrarSesion {
-                    // Esto cierra la Activity y vuelve a la anterior
                     (context as? Activity)?.finish()
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp).height(56.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp)
+                .height(56.dp),
             shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red),
+            border = BorderStroke(1.dp, Color.Red),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = White)
         ) {
-            Text("Cerrar sesión", fontSize = 18.sp)
+            Text("CERRAR SESIÓN", fontSize = 18.sp, fontFamily = NunitoFamily)
         }
     }
 }
@@ -223,7 +231,8 @@ fun ProfileTextField(
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth(),
 
-        label = { Text(label) },
+        textStyle = TextStyle(fontFamily = NunitoFamily),
+        label = { Text(label, fontFamily = NunitoFamily) },
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = LigthPurple,
@@ -241,11 +250,10 @@ fun ProfileTextField(
 
 // --- PREVIEWS PARA PERFIL ---
 
-@Preview(showBackground = true, name = "Perfil - Vista Real")
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Perfil - Diseño Final")
 @Composable
-fun PreviewProfileDirecta() {
-    // 1. Creamos la instancia manualmente (sin usar viewModel())
-    // Esto evita que busque la base de datos o el motor de Compose
+fun PreviewProfileFinal() {
     val fakeVm = remember {
         ProfileViewModel().apply {
             nombre = "Juan Pérez"
@@ -254,11 +262,24 @@ fun PreviewProfileDirecta() {
     }
 
     MaccsEventsTheme(darkTheme = true) {
-        // 2. Forzamos el Scaffold y la Surface a Negro para que no salga blanco
         Scaffold(
             containerColor = Color.Black,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("Mi Perfil",
+                            style = TextStyle(
+                                fontFamily = NunitoFamily,
+                                color = LigthPurple,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+                )
+            },
             bottomBar = {
-                // Representación visual de tu AppBottomBar
                 Surface(
                     modifier = Modifier.fillMaxWidth().height(60.dp),
                     color = Color(0xFF121212)
@@ -270,13 +291,10 @@ fun PreviewProfileDirecta() {
                 }
             }
         ) { padding ->
-            Surface(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                color = Color.Black
-            ) {
-                // Llamamos a tu función original sin cambiarle nada
-                ProfileScreen(viewModel = fakeVm)
-            }
+            ProfileScreen(
+                viewModel = fakeVm,
+                modifier = Modifier.padding(padding)
+            )
         }
     }
 }
