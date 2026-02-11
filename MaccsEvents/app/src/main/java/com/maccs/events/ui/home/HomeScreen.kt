@@ -1,5 +1,6 @@
 package com.maccs.events.ui.home
 
+import android.hardware.lights.Light
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,13 +20,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.maccs.events.R.drawable.fav_icon
+import com.maccs.events.R.drawable.fav_icon_filled
 import com.maccs.events.data.model.Event
 import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -173,16 +179,16 @@ fun EventCard(
                 )
 
                 Surface(
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = LigthPurple,
                     shape = RoundedCornerShape(bottomStart = 12.dp),
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
                     Text(
                         text = "${event.price} €",
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.labelLarge.copy(fontFamily = NunitoFamily),
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = Color.White
                     )
                 }
             }
@@ -199,7 +205,7 @@ fun EventCard(
                 ) {
                     Text(
                         text = event.name,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         modifier = Modifier.weight(1f)
@@ -210,9 +216,11 @@ fun EventCard(
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
-                            imageVector = if (event.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            painter = painterResource(
+                                id = if (event.isFavorite) fav_icon_filled else fav_icon
+                            ),
                             contentDescription = "Favorito",
-                            tint = if (event.isFavorite) Color.Red else Color.Gray
+                            tint = if (event.isFavorite) LigthPurple else LigthPurple
                         )
                     }
                 }
@@ -229,7 +237,7 @@ fun EventCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "${event.location} • $formattedDate",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
