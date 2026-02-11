@@ -1,292 +1,223 @@
 package com.maccs.events.ui.event
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import java.util.Calendar
-import java.text.SimpleDateFormat
-import java.util.Locale
-import androidx.compose.foundation.clickable
+import androidx.compose.ui.unit.sp
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import androidx.compose.ui.platform.LocalContext
 import java.util.*
+import androidx.compose.foundation.clickable
 
-
-
-@OptIn(ExperimentalMaterial3Api::class) // para DatePicker y TimePicker
 @Composable
-fun EventFormScreen(eventId: String?) {
-    val titleText = if (eventId == null) "Nuevo Evento" else "Editar Evento"
-
-    var eventTitle by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
-
-
-    // Para añadir imágen de la galería
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
-    // Lanzador para abrir la galería
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        selectedImageUri = uri
-    }
-
-    //para el campo de fecha
-    var showDatePicker by remember { mutableStateOf(false) }
-    var showTimePicker by remember { mutableStateOf(false) }
+fun EventFormScreen(viewModel: EventFormViewModel,
+                    onPickImage: () -> Unit) {
+    val state by viewModel.uiState.collectAsState()
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-
-    //lógica de validación al pulsar el boton "Guardar"
-    // El formulario es válido si el título, localización, fecha y hora no están vacíos
-    val isFormValid = eventTitle.isNotBlank() &&
-            location.isNotBlank() &&
-            date.isNotBlank() &&
-            time.isNotBlank()
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.Black
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .padding(24.dp)
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Text(
-                text = titleText,
-                color = Color(0xFFBB86FC),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
+        // Título dinámico según el estado
+        Text(
+            text = if (state.isEditing) "Editar Evento" else "Nuevo Evento",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF9333EA) // LigthPurple
+        )
 
-            //texto debajo del título
-            Text(
-                text = "No pierdas la oportunidad de anunciar tu evento. Rellena los campos con la información correcta.",
-                color = Color.Gray,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+        Text(
+            text = "Define un evento personal o selecciona colaborativo si eres administrador de uno",
+            fontSize = 14.sp,
+            color = Color.Gray
+        )
 
-            Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo Título
-            OutlinedTextField(
-                value = eventTitle,
-                onValueChange = { eventTitle = it },
-                label = { Text("Título del evento") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFBB86FC),
-                    unfocusedBorderColor = Color.DarkGray,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+        // Campo Título
+        CustomTextField(
+            value = state.name,
+            onValueChange = { viewModel.onNameChange(it) },
+            label = "Título del evento",
+            borderColor = Color(0xFF9333EA)
+        )
+
+        // Campo Localización
+        CustomTextField(
+            value = state.location,
+            onValueChange = { viewModel.onLocationChange(it) },
+            label = "Localización"
+        )
+
+        // Fila Fecha y Hora
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+            // Selector de Fecha
+            Box(modifier = Modifier.weight(2f)) {
+                CustomTextField(
+                    value = state.date,
+                    onValueChange = { },
+                    label = "dd/MM/yyyy",
+                    readOnly = true
                 )
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Campo Localización (que faltaba poner el estado)
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text("Localización") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFBB86FC),
-                    unfocusedBorderColor = Color.DarkGray,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
-
-                )
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Fila para Fecha y Hora con selectores
-            Row(modifier = Modifier.fillMaxWidth()) {
-                // Selector de Fecha
-                Box(modifier = Modifier.weight(1f)) {
-                    OutlinedTextField(
-                        value = date,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("dd/MM/yyyy", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFBB86FC),
-                            unfocusedBorderColor = Color.DarkGray,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        )
-                    )
-
-                    Box(modifier = Modifier.matchParentSize().clickable { showDatePicker = true })
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Selector de Hora
-                Box(modifier = Modifier.weight(0.5f)) {
-                    OutlinedTextField(
-                        value = time,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Hora", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFBB86FC),
-                            unfocusedBorderColor = Color.DarkGray,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        )
-                    )
-                    Box(modifier = Modifier.matchParentSize().clickable { showTimePicker = true })
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            // Campo Descripción
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Descripción / notas", color = Color.Gray) },
-                modifier = Modifier.fillMaxWidth().height(150.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFBB86FC),
-                    unfocusedBorderColor = Color.DarkGray,
-                    focusedTextColor = Color.White
-                )
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Fila para Imagen y Precio
-            Row(modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(
-                    onClick = { galleryLauncher.launch("image/*") }, // Abre la galería
+                // Capa clicable encima
+                Box(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp)
-                        .padding(top = 8.dp),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.DarkGray),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Gray)
-                ) {
-                    // Si ya se ha seleccionado una imagen, aparece mensaje
-                    Text(
-                        text = if (selectedImageUri != null) "✓ Foto Lista" else "Añadir Imagen",
-                        color = if (selectedImageUri != null) Color(0xFFBB86FC) else Color.Gray
-                    )
-                }
-
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                OutlinedTextField(
-                    value = price,
-                    onValueChange = { price = it },
-                    label = { Text("Precio", color = Color.Gray) },
-                    modifier = Modifier.weight(1f),
-                    // teclado numérico
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFBB86FC),
-                        unfocusedBorderColor = Color.DarkGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
-                    )
-                )
-            }
-
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            //botón guardar
-            Button(
-                onClick = {
-                    if (isFormValid) {
-                        // Aquí va la lógica para enviar la info a la BD
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .width(120.dp)
-                    .height(48.dp),
-                // El botón se deshabilita si el formulario no es válido
-                enabled = isFormValid,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    disabledContainerColor = Color.Black.copy(alpha = 0.5f)
-                ),
-                border = androidx.compose.foundation.BorderStroke(
-                    width = 1.dp,
-                    color = if (isFormValid) Color(0xFFBB86FC) else Color.DarkGray
-                ),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Guardar",
-                    color = if (isFormValid) Color.White else Color.Gray
-                )
-            }
-        }
-
-        // lógica para las ventanas emergentes (POP-UPS)
-        if (showDatePicker) {
-            val datePickerState = rememberDatePickerState()
-            DatePickerDialog(
-                onDismissRequest = { showDatePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val selectedDate = Date(millis)
-                            date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)
+                        .matchParentSize()
+                        .clickable {
+                            DatePickerDialog(
+                                context,
+                                { _, year, month, day ->
+                                    // Formateamos con %02d para que siempre tenga 2 dígitos (ej: 05/09/2026)
+                                    val dateFormatted = String.format("%02d/%02d/%04d", day, month + 1, year)
+                                    viewModel.onDateChange(dateFormatted)
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH)
+                            ).show()
                         }
-                        showDatePicker = false
-                    }) { Text("Aceptar") }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
-                }
-            ) { DatePicker(state = datePickerState) }
+                )
+            }
+
+            // Selector de Hora
+            Box(modifier = Modifier.weight(1f)) {
+                CustomTextField(
+                    value = state.time,
+                    onValueChange = { },
+                    label = "Hora",
+                    readOnly = true
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable {
+                            TimePickerDialog(
+                                context,
+                                { _, hour, minute ->
+                                    viewModel.onTimeChange(String.format("%02d:%02d", hour, minute))
+                                },
+                                calendar.get(Calendar.HOUR_OF_DAY),
+                                calendar.get(Calendar.MINUTE),
+                                true
+                            ).show()
+                        }
+                )
+            }
         }
 
-        if (showTimePicker) {
-            val timePickerState = rememberTimePickerState()
-            AlertDialog(
-                onDismissRequest = { showTimePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        time = String.format("%02d:%02d", timePickerState.hour, timePickerState.minute)
-                        showTimePicker = false
-                    }) { Text("Aceptar") }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showTimePicker = false }) { Text("Cancelar") }
-                },
-                title = { Text("Selecciona la hora") },
-                text = { TimePicker(state = timePickerState) }
+        // Campo Descripción
+        CustomTextField(
+            value = state.description,
+            onValueChange = { viewModel.onDescriptionChange(it) },
+            label = "Descripción / notas",
+            modifier = Modifier.height(150.dp),
+            singleLine = false
+        )
+
+        // Fila Imagen y Precio
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            CustomButtonField(
+                text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen seleccionada!",
+                modifier = Modifier.weight(1f),
+                onClick = { onPickImage() } // <-- Ahora llama a la galería real
             )
+
+            CustomTextField(
+                value = state.price,
+                onValueChange = { viewModel.onPriceChange(it) },
+                label = "Precio",
+                modifier = Modifier.weight(1f),
+                keyboardType = KeyboardType.Number
+            )
+        }
+
+
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Botón Guardar
+        Button(
+            onClick = { viewModel.saveEvent() },
+            modifier = Modifier
+                .align(Alignment.End)
+                .width(120.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            border = BorderStroke(1.dp, Color(0xFF9333EA))
+        ) {
+            Text("Guardar", color = Color.White)
+        }
+    }
+}
+
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    borderColor: Color = Color.Gray.copy(alpha = 0.5f),
+    keyboardType: KeyboardType = KeyboardType.Text,
+    singleLine: Boolean = true,
+    readOnly: Boolean = false // Añadimos este parámetro
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        readOnly = readOnly, // Aplicamos el readOnly aquí
+        placeholder = { Text(label, color = Color.Gray) },
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFF9333EA),
+            unfocusedBorderColor = borderColor,
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        singleLine = singleLine
+    )
+}
+
+@Composable
+fun CustomButtonField(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {} // Añadimos el parámetro onClick
+) {
+    OutlinedCard(
+        onClick = onClick, // Ahora el Card reacciona al click
+        modifier = modifier.height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f)),
+        colors = CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = text, color = Color.Gray)
         }
     }
 }

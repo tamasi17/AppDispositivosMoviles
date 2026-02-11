@@ -2,6 +2,7 @@ package com.maccs.events.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.type.DateTime
 
 /**
  * Represents the 'events' table in the SQLite database.
@@ -15,6 +16,10 @@ data class EventEntity(
     val date: Long, // Stored as a timestamp (Long) for efficient sorting
     val location: String,
     val imageUrl: String,
+    val price: Double,
     val isFavorite: Boolean = false,
-    val price: Double
+    val isAttending: Boolean = false,
+    val shortDescription: String,
+    val longDescription: String,
+    val userId: String
 )
