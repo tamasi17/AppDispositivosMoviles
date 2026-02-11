@@ -51,6 +51,7 @@ class FavoritesActivity : ComponentActivity() {
         val favorites by viewModel.favorites.collectAsState()
 
         Scaffold(
+            containerColor = Color.Black,
             topBar = {
                 TopAppBar(
                     title = {
