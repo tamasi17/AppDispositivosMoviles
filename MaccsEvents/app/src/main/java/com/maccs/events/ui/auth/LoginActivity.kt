@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -71,6 +73,10 @@ class LoginActivity : ComponentActivity() {
 @Composable
 fun LoginScreen(onLoginClick: (String, String) -> Unit,
                 onRegisterClick: () -> Unit) {
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     // 2. Gestión de Estado (State)
     Column(
         modifier = Modifier
