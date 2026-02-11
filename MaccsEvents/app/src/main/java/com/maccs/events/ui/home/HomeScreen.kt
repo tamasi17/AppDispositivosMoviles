@@ -2,6 +2,7 @@ package com.maccs.events.ui.home
 
 import android.hardware.lights.Light
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -211,18 +212,21 @@ fun EventCard(
                         modifier = Modifier.weight(1f)
                     )
 
-                    IconButton(
-                        onClick = onFavoriteClick,
-                        modifier = Modifier.size(24.dp)
-                    ) {
+
                         Icon(
                             painter = painterResource(
                                 id = if (event.isFavorite) fav_icon_filled else fav_icon
                             ),
                             contentDescription = "Favorito",
-                            tint = if (event.isFavorite) LigthPurple else LigthPurple
+                            tint = if (event.isFavorite) LigthPurple else LigthPurple,
+                            modifier = Modifier
+                            .size(24.dp) // Controlas el tamaño exacto
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null, // ESTO elimina el círculo/onda visual al pulsar
+                                onClick = onFavoriteClick
+                            )
                         )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

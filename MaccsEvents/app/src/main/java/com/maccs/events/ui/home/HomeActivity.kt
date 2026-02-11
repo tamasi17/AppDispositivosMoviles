@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -291,14 +292,22 @@ class HomeActivity : ComponentActivity() {
                             modifier = Modifier.weight(1f)
                         )
                         // BOTÓN FAVORITO
-                        IconButton(onClick = onFavoriteClick) {
+
                             Icon(
                                 painter = painterResource(
                                     id = if (event.isFavorite) fav_icon_filled else fav_icon
                                 ),
                                 contentDescription = "Favorito",
-                                tint = if (event.isFavorite) LigthPurple else Color.Gray                            )
-                        }
+                                tint = if (event.isFavorite) LigthPurple else Color.Gray,
+                                modifier = Modifier
+                                .size(24.dp) // Controlas el tamaño exacto
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null, // ESTO elimina el círculo/onda visual al pulsar
+                                    onClick = onFavoriteClick
+                                )
+                            )
+
                     }
 
                     Text(
