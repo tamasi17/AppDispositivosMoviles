@@ -1,6 +1,7 @@
 package com.maccs.events.ui.event
 
 import android.R
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,14 +24,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.maccs.events.R.drawable.fav_icon
 import com.maccs.events.R.drawable.fav_icon_filled
+import com.maccs.events.ui.home.HomePreviewData
 import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.MaccsEventsTheme
 import com.maccs.events.ui.theme.NunitoFamily
 
 
@@ -82,16 +87,17 @@ fun EventDetailScreen(
     }
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = "Detalle del Evento",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = NunitoFamily,
-                        fontSize = 24.sp,
-                        color = LigthPurple
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Detalle del Evento",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = NunitoFamily,
+                            fontSize = 24.sp,
+                            color = LigthPurple
+                        )
                     )
-                )
-            },
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
@@ -126,16 +132,21 @@ fun EventDetailScreen(
                 is EventDetailUiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
+
                 is EventDetailUiState.Error -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text("Error al cargar el evento")
-                        Text(text = state.message, style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily),
-                            color = Color.Red)
+                        Text(
+                            text = state.message,
+                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily),
+                            color = Color.Red
+                        )
                     }
                 }
+
                 is EventDetailUiState.Success -> {
                     val event = state.event
 
@@ -226,8 +237,10 @@ fun EventDetailScreen(
                                     onClick = { /* Lógica asistir */ },
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Asistiré",
-                                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily))
+                                    Text(
+                                        "Asistiré",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily)
+                                    )
                                 }
                             }
                         }
@@ -237,5 +250,125 @@ fun EventDetailScreen(
                 else -> {}
             }
         }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Detalle - Vista Éxito")
+@Composable
+fun PreviewDetailSuccess() {
+    val event = HomePreviewData.events[0] // Tech Fest Madrid
+
+    MaccsEventsTheme (darkTheme = true) {
+        // Simulamos la UI de detalle
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            "Detalle del Evento",
+                            style = TextStyle(
+                                fontFamily = NunitoFamily,
+                                color = LigthPurple,
+                                fontSize = 24.sp
+                            )
+                        )
+                    },
+                    navigationIcon = {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = null,
+                            tint = LigthPurple
+                        )
+                    }
+                )
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier.padding(padding)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Simulación de imagen y contenido
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(250.dp)
+                        .background(Color.Gray)
+                )
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        event.name,
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontFamily = NunitoFamily,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        event.longDescription,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily)
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        OutlinedButton(onClick = {}, modifier = Modifier.weight(1f)) {
+                            Text("Favorito", fontFamily = NunitoFamily)
+                        }
+                        Button(
+                            onClick = {},
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = LigthPurple)
+                        ) {
+                            Text(
+                                "Asistiré",
+                                color = Color.Black,
+                                fontFamily = NunitoFamily,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Diálogo - Confirmar Borrado")
+@Composable
+fun PreviewDeleteDialog() {
+    MaccsEventsTheme(darkTheme = true) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = {
+                Text(
+                    "¿Borrar evento?",
+                    style = TextStyle(
+                        fontFamily = NunitoFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            },
+            text = {
+                Text(
+                    "Esta acción no se puede deshacer.",
+                    style = TextStyle(fontFamily = NunitoFamily)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { }) {
+                    Text(
+                        "Borrar",
+                        color = Color.Red,
+                        style = TextStyle(
+                            fontFamily = NunitoFamily,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { }) {
+                    Text("Cancelar", style = TextStyle(fontFamily = NunitoFamily))
+                }
+            }
+        )
     }
 }
