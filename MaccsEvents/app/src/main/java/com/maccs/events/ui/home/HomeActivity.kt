@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -46,6 +48,10 @@ import java.util.Locale
 import androidx.compose.ui.unit.sp
 import com.maccs.events.ui.theme.LigthPurple
 import com.maccs.events.ui.theme.NunitoFamily
+import androidx.compose.ui.tooling.preview.Preview
+import com.maccs.events.R.drawable.fav_icon_filled
+import com.maccs.events.R.drawable.fav_icon
+
 class HomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -285,9 +291,11 @@ class HomeActivity : ComponentActivity() {
                         // BOTÓN FAVORITO
                         IconButton(onClick = onFavoriteClick) {
                             Icon(
-                                imageVector = if (event.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                painter = painterResource(
+                                    id = if (event.isFavorite) fav_icon_filled else fav_icon
+                                ),
                                 contentDescription = "Favorito",
-                                tint = if (event.isFavorite) Color.Red else Color.Gray
+                                tint = if (event.isFavorite) com.maccs.events.ui.theme.LigthPurple else com.maccs.events.ui.theme.LigthPurple
                             )
                         }
                     }
@@ -333,6 +341,161 @@ class HomeActivity : ComponentActivity() {
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+// --- DATOS PARA PREVIEWS (Basados en tu FakeDataSource) ---
+object HomePreviewData {
+    val events = listOf(
+        Event(
+            id = "1",
+            name = "Tech Fest Madrid 2024",
+            date = 1710493200000L,
+            location = "Campus UC3M",
+            price = 45.0,
+            imageUrl = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000",
+            shortDescription = "El mayor evento de tecnología.",
+            longDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+            isFavorite = false,
+            isAttending = true,
+        ),
+        Event(
+            id = "2",
+            name = "Concierto Jazz",
+            date = 1711098000000L,
+            location = "Sala Barco",
+            price = 12.5,
+            imageUrl = "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1000",
+            shortDescription = "Música suave al aire libre.",
+            longDescription = "Disfruta de una velada inolvidable...",
+            isFavorite = true,
+            isAttending = false
+        ),
+        Event(
+            id = "3",
+            name = "Taller de Sushi",
+            date = 1712307600000L,
+            location = "Don Buri",
+            price = 60.0,
+            imageUrl = "https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1000",
+            shortDescription = "Aprende con el chef Kenji.",
+            longDescription = "Materiales incluidos para aprender a hacer makis...",
+            isFavorite = false,
+            isAttending = false
+        )
+    )
+}
+
+// --- TODAS LAS VARIANTES DE PREVIEW ---
+
+@Preview(showBackground = true, name = "1. Estado: Cargando")
+@Composable
+fun PreviewHomeLoading() {
+    MaccsEventsTheme(darkTheme = true) {
+        // Simulamos el interior del Scaffold cuando state.isLoading es true
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+            CircularProgressIndicator(
+                color = LigthPurple,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "2. Estado: Lista Vacía")
+@Composable
+fun PreviewHomeEmpty() {
+    MaccsEventsTheme(darkTheme = true) {
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+            Text(
+                text = "No hay eventos disponibles",
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.Gray,
+                fontFamily = NunitoFamily
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "3. Estado: Buscando")
+@Composable
+fun PreviewHomeSearching() {
+    MaccsEventsTheme(darkTheme = true) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        TextField(
+                            value = "Jazz",
+                            onValueChange = {},
+                            placeholder = { Text("Buscar eventos...", color = Color.Gray, fontFamily = NunitoFamily) },
+                            modifier = Modifier.fillMaxWidth(),
+                            textStyle = TextStyle(fontFamily = NunitoFamily, fontSize = 18.sp),
+                            singleLine = true
+                        )
+                    },
+                    actions = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = LigthPurple)
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Column(modifier = Modifier.padding(padding)) {
+                // Mostramos solo el resultado que coincide
+                EventCard(event = HomePreviewData.events[1], onClick = {}, onFavoriteClick = {})
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "4. Estado: Lista Completa (Real)")
+@Composable
+fun PreviewHomeFullList() {
+    MaccsEventsTheme() {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("Próximos Eventos",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontFamily = NunitoFamily,
+                                color = LigthPurple,
+                                fontSize = 24.sp
+                            )
+                        )
+                    },
+                    actions = {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.search_icon_svg),
+                                contentDescription = "Buscar",
+                                modifier = Modifier.size(24.dp),
+                                tint = LigthPurple
+                            )
+                        }
+                    }
+                )
+            },
+            bottomBar = { AppBottomBar() }
+        ) { innerPadding ->
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentPadding = PaddingValues(vertical = 8.dp)
+            ) {
+                items(HomePreviewData.events) { event ->
+                    EventCard(
+                        event = event,
+                        onClick = {},
+                        onFavoriteClick = {}
+                    )
                 }
             }
         }
