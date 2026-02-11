@@ -1,13 +1,12 @@
 package com.maccs.events.ui.event
 
+import android.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -23,11 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-
+import com.maccs.events.R.drawable.fav_icon
+import com.maccs.events.R.drawable.fav_icon_filled
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,8 +82,16 @@ fun EventDetailScreen(
     }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Detalle del Evento") },
+            TopAppBar(title = {
+                Text(
+                    text = "Detalle del Evento",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontFamily = NunitoFamily,
+                        fontSize = 24.sp,
+                        color = LigthPurple
+                    )
+                )
+            },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
@@ -92,7 +104,7 @@ fun EventDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Editar evento",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = LigthPurple
                             )
                         }
 
@@ -120,7 +132,8 @@ fun EventDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text("Error al cargar el evento")
-                        Text(text = state.message, style = MaterialTheme.typography.bodySmall, color = Color.Red)
+                        Text(text = state.message, style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily),
+                            color = Color.Red)
                     }
                 }
                 is EventDetailUiState.Success -> {
@@ -149,7 +162,7 @@ fun EventDetailScreen(
                             // Título
                             Text(
                                 text = event.name,
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.headlineMedium.copy(fontFamily = NunitoFamily),
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -160,13 +173,13 @@ fun EventDetailScreen(
                                 Icon(
                                     Icons.Default.LocationOn,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.secondary
+                                    tint = LigthPurple
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = event.location,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.secondary
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontFamily = NunitoFamily),
+                                    color = LigthPurple
                                 )
                             }
 
@@ -175,13 +188,13 @@ fun EventDetailScreen(
                             // Descripción
                             Text(
                                 text = "Descripción",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
                                 fontWeight = FontWeight.SemiBold
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = event.longDescription,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),
                                 lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
                             )
 
@@ -198,9 +211,11 @@ fun EventDetailScreen(
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Icon(
-                                        imageVector = if (event.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                        painter = painterResource(
+                                            id = if (event.isFavorite) fav_icon_filled else fav_icon
+                                        ),
                                         contentDescription = null,
-                                        tint = if (event.isFavorite) Color.Red else MaterialTheme.colorScheme.primary
+                                        tint = if (event.isFavorite) LigthPurple else Color.Gray
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(if (event.isFavorite) "Quitar" else "Favorito")
@@ -211,7 +226,8 @@ fun EventDetailScreen(
                                     onClick = { /* Lógica asistir */ },
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Asistiré")
+                                    Text("Asistiré",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily))
                                 }
                             }
                         }
