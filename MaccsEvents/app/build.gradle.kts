@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
 }
 
 android {
@@ -55,6 +56,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.room.common.jvm)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -81,11 +83,29 @@ dependencies {
     //Cargador de imágenes
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    // Iconos básicos
+    //Navegador de ViewModels para la HomePage
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7") // O la versión2.10.0 que usas
+    
+     // Iconos básicos
     implementation("androidx.compose.material:material-icons-core")
 
     // Iconos extendidos (Añadir, Favoritos, etc. suelen estar aquí)
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("androidx.navigation:navigation-compose:2.8.5")
+
+    //Cargador de imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // --- ROOM DATABASE ---
+    val room_version = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    // Para usar Corrutinas y Flow
+    implementation("androidx.room:room-ktx:$room_version")
+    // Compilador para Room
+    add("ksp", "androidx.room:room-compiler:$room_version")
+
+   
+
 }
