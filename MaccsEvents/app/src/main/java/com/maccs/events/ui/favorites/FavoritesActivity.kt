@@ -23,6 +23,8 @@ import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.home.EventCard // Reusing your existing component
 import com.maccs.events.ui.theme.MaccsEventsTheme
 import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
+
 class FavoritesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +53,8 @@ class FavoritesActivity : ComponentActivity() {
                     title = {
                         Text(
                             "Mis Favoritos",
-                            style = MaterialTheme.typography.titleLarge.copy(color = LigthPurple)
+                            style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
+                            color = LigthPurple
                         )
                     }
                 )

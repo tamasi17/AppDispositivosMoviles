@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.clip
 import com.maccs.events.R
 import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.theme.NunitoFamily
 
 @Composable
 fun FavoritesScreen(modifier: Modifier = Modifier) {
@@ -44,16 +45,16 @@ fun FavoritesScreen(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
             // CAMBIO: Ahora usa el fondo del tema (blanco en light, negro en dark)
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color.Black)
             .padding(16.dp)
     ) {
         Text(
             text = "Mis Favoritos",
-            // CAMBIO: Color morado por defecto del tema
-            color = LigthPurple,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = NunitoFamily,
+                fontSize = 24.sp,
+                color = LigthPurple
+            )
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -193,7 +194,7 @@ fun EventoCardPreview() {
 fun FavoritesEmptyPreview() {
     MaccsEventsTheme {
         Surface(
-            color = MaterialTheme.colorScheme.background
+            color = Color.Black
         ) {
             // Aquí forzamos una versión de la pantalla que no tenga datos
             // Si usas el Repositorio, podrías simularlo o simplemente llamar
@@ -213,9 +214,11 @@ fun FavoritesContentEmptyState() {
     ) {
         Text(
             text = "Mis Favoritos",
-            color = Color(0xFF8A2BE2), // Tu morado de proyecto
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = NunitoFamily,
+                fontSize = 24.sp,
+                color = LigthPurple,
+            )
         )
 
         Box(

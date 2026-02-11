@@ -169,7 +169,7 @@ class HomeActivity : ComponentActivity() {
                             Text("Próximos Eventos",
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontFamily = NunitoFamily,
-                                    color = _root_ide_package_.com.maccs.events.ui.theme.LigthPurple,
+                                    color = LigthPurple,
                                     fontSize = 24.sp
                                 )
                             )
