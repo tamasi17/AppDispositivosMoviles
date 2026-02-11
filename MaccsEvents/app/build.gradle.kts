@@ -56,9 +56,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.room.common.jvm)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -81,6 +83,20 @@ dependencies {
     //Cargador de imágenes
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+    //Navegador de ViewModels para la HomePage
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7") // O la versión2.10.0 que usas
+    
+     // Iconos básicos
+    implementation("androidx.compose.material:material-icons-core")
+
+    // Iconos extendidos (Añadir, Favoritos, etc. suelen estar aquí)
+    implementation("androidx.compose.material:material-icons-extended")
+
+    implementation("androidx.navigation:navigation-compose:2.8.5")
+
+    //Cargador de imágenes
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
     // --- ROOM DATABASE ---
     val room_version = "2.6.1"
 
@@ -88,6 +104,8 @@ dependencies {
     // Para usar Corrutinas y Flow
     implementation("androidx.room:room-ktx:$room_version")
     // Compilador para Room
-    ksp("androidx.room:room-compiler:$room_version")
+    add("ksp", "androidx.room:room-compiler:$room_version")
+
+   
 
 }
