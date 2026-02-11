@@ -50,13 +50,14 @@ fun EventFormContent(
         containerColor = Color.Black, // Fondo negro puro
         topBar = {
             TopAppBar(
-                title = { Text(
-                    text = if (state.name.isEmpty()) "Crear Evento" else "Editar Evento",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = NunitoFamily,
-                        fontSize = 24.sp,
+                title = {
+
+                    Text(
+                        text = if (state.name.isEmpty()) "Crear Evento" else "Editar Evento",
+                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
                         color = LigthPurple
-                    )) },
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Black, // Barra superior también negra
                     titleContentColor = LigthPurple
