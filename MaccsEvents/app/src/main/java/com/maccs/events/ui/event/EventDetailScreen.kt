@@ -265,8 +265,8 @@ fun PreviewDetailSuccess() {
                 TopAppBar(
                     title = {
                         Text(
-                            "Detalle del Evento",
-                            style = TextStyle(
+                            text = "Detalle del Evento",
+                            style = MaterialTheme.typography.titleLarge.copy(
                                 fontFamily = NunitoFamily,
                                 color = LigthPurple,
                                 fontSize = 24.sp
