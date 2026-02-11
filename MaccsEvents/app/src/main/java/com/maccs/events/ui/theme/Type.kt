@@ -29,7 +29,7 @@ val Typography = Typography(
     titleLarge = TextStyle(
         fontFamily = NunitoFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 22.sp,
+        fontSize = 24.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
