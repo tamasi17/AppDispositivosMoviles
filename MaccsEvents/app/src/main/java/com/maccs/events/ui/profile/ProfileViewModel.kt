@@ -49,7 +49,6 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
 
     fun toggleEdit() {
         if (isEditable) {
-            // Si cancelamos, recargamos los datos originales de la DB
             cargarDatosDesdeRoom()
         }
         isEditable = !isEditable
@@ -64,7 +63,7 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
                 profileImagePath = imageUri?.toString()
             )
             userDao.insertUser(user)
-            isEditable = false // Bloquear campos tras guardar
+            isEditable = false
         }
     }
 
