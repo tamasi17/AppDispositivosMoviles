@@ -262,7 +262,7 @@ class HomeActivity : ComponentActivity() {
                     )
                     // PRECIO
                     Surface(
-                        color = MaterialTheme.colorScheme.primary,
+                        color = LigthPurple,
                         shape = RoundedCornerShape(bottomStart = 8.dp),
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
@@ -295,8 +295,7 @@ class HomeActivity : ComponentActivity() {
                                     id = if (event.isFavorite) fav_icon_filled else fav_icon
                                 ),
                                 contentDescription = "Favorito",
-                                tint = if (event.isFavorite) com.maccs.events.ui.theme.LigthPurple else com.maccs.events.ui.theme.LigthPurple
-                            )
+                                tint = if (event.isFavorite) LigthPurple else Color.Gray                            )
                         }
                     }
 
