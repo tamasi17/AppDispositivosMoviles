@@ -143,6 +143,7 @@ class HomeActivity : ComponentActivity() {
         val state by viewModel.uiState.collectAsState()
 
         Scaffold(
+            containerColor = Color.Black,
             topBar = {
                 TopAppBar(
                     title = {
@@ -188,8 +189,9 @@ class HomeActivity : ComponentActivity() {
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                        containerColor = Color.Black,
+                        titleContentColor = LigthPurple,
+                        actionIconContentColor = LigthPurple
                     )
                 )
             },
@@ -197,7 +199,7 @@ class HomeActivity : ComponentActivity() {
                 AppBottomBar()
             }
         ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            Box(modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.Black)) {
                 if (state.isLoading) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary,
@@ -244,7 +246,7 @@ class HomeActivity : ComponentActivity() {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .clickable { onClick() },
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = Color.Gray
             ),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -393,9 +395,9 @@ object HomePreviewData {
 @Preview(showBackground = true, name = "1. Estado: Cargando")
 @Composable
 fun PreviewHomeLoading() {
-    MaccsEventsTheme(darkTheme = true) {
+    MaccsEventsTheme() {
         // Simulamos el interior del Scaffold cuando state.isLoading es true
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             CircularProgressIndicator(
                 color = LigthPurple,
                 modifier = Modifier.align(Alignment.Center)
@@ -407,8 +409,8 @@ fun PreviewHomeLoading() {
 @Preview(showBackground = true, name = "2. Estado: Lista Vacía")
 @Composable
 fun PreviewHomeEmpty() {
-    MaccsEventsTheme(darkTheme = true) {
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    MaccsEventsTheme() {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             Text(
                 text = "No hay eventos disponibles",
                 modifier = Modifier.align(Alignment.Center),
@@ -423,78 +425,84 @@ fun PreviewHomeEmpty() {
 @Preview(showBackground = true, name = "3. Estado: Buscando")
 @Composable
 fun PreviewHomeSearching() {
-    MaccsEventsTheme(darkTheme = true) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        TextField(
-                            value = "Jazz",
-                            onValueChange = {},
-                            placeholder = { Text("Buscar eventos...", color = Color.Gray, fontFamily = NunitoFamily) },
-                            modifier = Modifier.fillMaxWidth(),
-                            textStyle = TextStyle(fontFamily = NunitoFamily, fontSize = 18.sp),
-                            singleLine = true
-                        )
-                    },
-                    actions = {
-                        IconButton(onClick = {}) {
-                            Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = LigthPurple)
+    MaccsEventsTheme() {
+            Scaffold(
+                containerColor = Color.Black,
+                topBar = {
+                    TopAppBar(
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Black, // 3. Barra superior negra
+                            titleContentColor = LigthPurple
+                        ),
+                        title = {
+                            TextField(
+                                value = "Jazz",
+                                onValueChange = {},
+                                placeholder = {
+                                    Text(
+                                        "Buscar eventos...",
+                                        color = Color.Gray,
+                                        fontFamily = NunitoFamily
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                textStyle = TextStyle(fontFamily = NunitoFamily, fontSize = 18.sp, color = Color.White),
+                                singleLine = true
+                            )
+                        },
+                        actions = {
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Cerrar",
+                                    tint = LigthPurple
+                                )
+                            }
                         }
-                    }
-                )
-            }
-        ) { padding ->
-            Column(modifier = Modifier.padding(padding)) {
-                // Mostramos solo el resultado que coincide
-                EventCard(event = HomePreviewData.events[1], onClick = {}, onFavoriteClick = {})
+                    )
+                }
+            ) { padding ->
+                Column(modifier = Modifier.padding(padding).fillMaxSize().background(Color.Black)) {
+                    // Mostramos solo el resultado que coincide
+                    EventCard(event = HomePreviewData.events[1], onClick = {}, onFavoriteClick = {})
+                }
             }
         }
     }
-}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, name = "4. Estado: Lista Completa (Real)")
+@Preview(showBackground = true, name = "4. Home - Fondo Negro Real")
 @Composable
 fun PreviewHomeFullList() {
     MaccsEventsTheme() {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text("Próximos Eventos",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontFamily = NunitoFamily,
-                                color = LigthPurple,
-                                fontSize = 24.sp
+        Surface(color = Color.Black) { // Forzamos superficie negra
+            Scaffold(
+                containerColor = Color.Black,
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text("Próximos Eventos",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontFamily = NunitoFamily,
+                                    color = LigthPurple,
+                                    fontSize = 24.sp
+                                )
                             )
-                        )
-                    },
-                    actions = {
-                        IconButton(onClick = {}) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.search_icon_svg),
-                                contentDescription = "Buscar",
-                                modifier = Modifier.size(24.dp),
-                                tint = LigthPurple
-                            )
-                        }
-                    }
-                )
-            },
-            bottomBar = { AppBottomBar() }
-        ) { innerPadding ->
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
-                contentPadding = PaddingValues(vertical = 8.dp)
-            ) {
-                items(HomePreviewData.events) { event ->
-                    EventCard(
-                        event = event,
-                        onClick = {},
-                        onFavoriteClick = {}
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
                     )
+                },
+                bottomBar = { /* AppBottomBar() */ }
+            ) { innerPadding ->
+                LazyColumn(
+                    modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(HomePreviewData.events) { event ->
+                        EventCard(event = event, onClick = {}, onFavoriteClick = {})
+                    }
                 }
             }
         }
