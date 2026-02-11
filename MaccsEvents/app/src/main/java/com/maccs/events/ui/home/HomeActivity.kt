@@ -6,7 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -43,6 +46,12 @@ import com.maccs.events.ui.theme.MaccsEventsTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.unit.sp
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
+import androidx.compose.ui.tooling.preview.Preview
+import com.maccs.events.R.drawable.fav_icon_filled
+import com.maccs.events.R.drawable.fav_icon
 
 class HomeActivity : ComponentActivity() {
 
@@ -135,6 +144,7 @@ class HomeActivity : ComponentActivity() {
         val state by viewModel.uiState.collectAsState()
 
         Scaffold(
+            containerColor = Color.Black,
             topBar = {
                 TopAppBar(
                     title = {
@@ -143,7 +153,9 @@ class HomeActivity : ComponentActivity() {
                                 value = state.searchQuery,
                                 // Conectamos el input del usuario con el ViewModel
                                 onValueChange = { viewModel.onSearchQueryChanged(it) },
-                                placeholder = { Text("Buscar eventos...", color = Color.Gray) },
+                                placeholder = { Text("Buscar eventos...",
+                                    color = Color.Gray,
+                                    fontFamily = NunitoFamily) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 colors = TextFieldDefaults.colors(
@@ -154,7 +166,13 @@ class HomeActivity : ComponentActivity() {
                                 )
                             )
                         } else {
-                            Text("PRÓXIMOS EVENTOS", fontWeight = FontWeight.ExtraBold)
+                            Text("Próximos Eventos",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontFamily = NunitoFamily,
+                                    color = LigthPurple,
+                                    fontSize = 24.sp
+                                )
+                            )
                         }
                     },
                     actions = {
@@ -166,14 +184,15 @@ class HomeActivity : ComponentActivity() {
                                     painter = painterResource(id = R.drawable.search_icon_svg),
                                     contentDescription = "Buscar",
                                     modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = LigthPurple
                                 )
                             }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                        containerColor = Color.Black,
+                        titleContentColor = LigthPurple,
+                        actionIconContentColor = LigthPurple
                     )
                 )
             },
@@ -181,7 +200,7 @@ class HomeActivity : ComponentActivity() {
                 AppBottomBar()
             }
         ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            Box(modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.Black)) {
                 if (state.isLoading) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary,
@@ -191,7 +210,8 @@ class HomeActivity : ComponentActivity() {
                     Text(
                         text = "No hay eventos disponibles",
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color.Gray
+                        color = Color.Gray,
+                        fontFamily = NunitoFamily
                     )
                 } else {
                     LazyColumn(
@@ -227,7 +247,7 @@ class HomeActivity : ComponentActivity() {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .clickable { onClick() },
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = Color.Gray
             ),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -245,7 +265,7 @@ class HomeActivity : ComponentActivity() {
                     )
                     // PRECIO
                     Surface(
-                        color = MaterialTheme.colorScheme.primary,
+                        color = LigthPurple,
                         shape = RoundedCornerShape(bottomStart = 8.dp),
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
@@ -253,7 +273,8 @@ class HomeActivity : ComponentActivity() {
                             text = "${event.price} €",
                             modifier = Modifier.padding(8.dp),
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color.Black,
+                            fontFamily = NunitoFamily
                         )
                     }
                 }
@@ -267,26 +288,32 @@ class HomeActivity : ComponentActivity() {
                     ) {
                         Text(
                             text = event.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f)
                         )
                         // BOTÓN FAVORITO
-                        IconButton(onClick = onFavoriteClick) {
+
                             Icon(
-                                imageVector = if (event.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                painter = painterResource(
+                                    id = if (event.isFavorite) fav_icon_filled else fav_icon
+                                ),
                                 contentDescription = "Favorito",
-                                tint = if (event.isFavorite) Color.Red else Color.Gray
+                                tint = if (event.isFavorite) LigthPurple else Color.Gray,
+                                modifier = Modifier
+                                .size(24.dp) // Controlas el tamaño exacto
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null, // ESTO elimina el círculo/onda visual al pulsar
+                                    onClick = onFavoriteClick
+                                )
                             )
-                        }
+
                     }
 
                     Text(
                         // Usamos shortDescription si existe, o location como fallback visual
                         text = event.shortDescription ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.LightGray,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),                         color = Color.LightGray,
                         maxLines = 1
                     )
 
@@ -307,7 +334,7 @@ class HomeActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = event.location,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily),
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
@@ -319,11 +346,171 @@ class HomeActivity : ComponentActivity() {
                             Text(
                                 text = dateString,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color.Black,
+                                style = MaterialTheme.typography.labelLarge.copy(fontFamily = NunitoFamily),                                 color = Color.Black,
                                 fontWeight = FontWeight.Bold
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- DATOS PARA PREVIEWS (Basados en tu FakeDataSource) ---
+object HomePreviewData {
+    val events = listOf(
+        Event(
+            id = "1",
+            name = "Tech Fest Madrid 2024",
+            date = 1710493200000L,
+            location = "Campus UC3M",
+            price = 45.0,
+            imageUrl = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000",
+            shortDescription = "El mayor evento de tecnología.",
+            longDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+            isFavorite = false,
+            isAttending = true,
+        ),
+        Event(
+            id = "2",
+            name = "Concierto Jazz",
+            date = 1711098000000L,
+            location = "Sala Barco",
+            price = 12.5,
+            imageUrl = "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=1000",
+            shortDescription = "Música suave al aire libre.",
+            longDescription = "Disfruta de una velada inolvidable...",
+            isFavorite = true,
+            isAttending = false
+        ),
+        Event(
+            id = "3",
+            name = "Taller de Sushi",
+            date = 1712307600000L,
+            location = "Don Buri",
+            price = 60.0,
+            imageUrl = "https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1000",
+            shortDescription = "Aprende con el chef Kenji.",
+            longDescription = "Materiales incluidos para aprender a hacer makis...",
+            isFavorite = false,
+            isAttending = false
+        )
+    )
+}
+
+// --- TODAS LAS VARIANTES DE PREVIEW ---
+
+@Preview(showBackground = true, name = "1. Estado: Cargando")
+@Composable
+fun PreviewHomeLoading() {
+    MaccsEventsTheme() {
+        // Simulamos el interior del Scaffold cuando state.isLoading es true
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+            CircularProgressIndicator(
+                color = LigthPurple,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "2. Estado: Lista Vacía")
+@Composable
+fun PreviewHomeEmpty() {
+    MaccsEventsTheme() {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+            Text(
+                text = "No hay eventos disponibles",
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.Gray,
+                fontFamily = NunitoFamily
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "3. Estado: Buscando")
+@Composable
+fun PreviewHomeSearching() {
+    MaccsEventsTheme() {
+            Scaffold(
+                containerColor = Color.Black,
+                topBar = {
+                    TopAppBar(
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Black, // 3. Barra superior negra
+                            titleContentColor = LigthPurple
+                        ),
+                        title = {
+                            TextField(
+                                value = "Jazz",
+                                onValueChange = {},
+                                placeholder = {
+                                    Text(
+                                        "Buscar eventos...",
+                                        color = Color.Gray,
+                                        fontFamily = NunitoFamily
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                textStyle = TextStyle(fontFamily = NunitoFamily, fontSize = 18.sp, color = Color.White),
+                                singleLine = true
+                            )
+                        },
+                        actions = {
+                            IconButton(onClick = {}) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Cerrar",
+                                    tint = LigthPurple
+                                )
+                            }
+                        }
+                    )
+                }
+            ) { padding ->
+                Column(modifier = Modifier.padding(padding).fillMaxSize().background(Color.Black)) {
+                    // Mostramos solo el resultado que coincide
+                    EventCard(event = HomePreviewData.events[1], onClick = {}, onFavoriteClick = {})
+                }
+            }
+        }
+    }
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "4. Home - Fondo Negro Real")
+@Composable
+fun PreviewHomeFullList() {
+    MaccsEventsTheme() {
+        Surface(color = Color.Black) { // Forzamos superficie negra
+            Scaffold(
+                containerColor = Color.Black,
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text("Próximos Eventos",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontFamily = NunitoFamily,
+                                    color = LigthPurple,
+                                    fontSize = 24.sp
+                                )
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+                    )
+                },
+                bottomBar = { /* AppBottomBar() */ }
+            ) { innerPadding ->
+                LazyColumn(
+                    modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(HomePreviewData.events) { event ->
+                        EventCard(event = event, onClick = {}, onFavoriteClick = {})
                     }
                 }
             }

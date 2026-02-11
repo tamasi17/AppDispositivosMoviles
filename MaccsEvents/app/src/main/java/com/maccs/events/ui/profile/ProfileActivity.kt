@@ -33,12 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.ui.text.TextStyle
+import com.maccs.events.ui.auth.LoginActivity
+import com.maccs.events.ui.components.AppBottomBar
+import androidx.compose.ui.tooling.preview.Preview
 import com.maccs.events.R
 import com.maccs.events.data.local.AppDatabase
 import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.theme.*
 
 class ProfileActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -55,6 +62,25 @@ class ProfileActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Black,
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "Mi Perfil",
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontFamily = NunitoFamily,
+                                        color = LigthPurple,
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = Black,
+                                titleContentColor = LigthPurple
+                            )
+                        )
+                    },
                     bottomBar = { AppBottomBar() }
                 ) { innerPadding ->
                     ProfileScreen(
@@ -75,30 +101,32 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
         onResult = { uri -> viewModel.onImageSelected(uri) }
     )
 
+    // Usamos una Column con scroll por si los campos no caben en pantallas pequeñas
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .background(Black),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+      
+
+       // Mantenemos la fila de botones, pero quitamos el Título (porque ya está en la barra de arriba)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 48.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(top = 24.dp, bottom = 16.dp), // Ajustamos padding ya que hay barra arriba
+            horizontalArrangement = Arrangement.SpaceBetween, // Botones a los extremos
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /* Settings - No hace nada */ }) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings", tint = White)
+            // Botón Settings (Izquierda)
+            IconButton(onClick = { /* Settings - No hace nada aún */ }) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color.White) // Asegura Color.White
             }
 
-            Text(
-                text = "Mi Perfil",
-                color = LigthPurple,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+            // AQUÍ BORRAMOS EL TEXTO "MI PERFIL" PARA QUE NO SALGA DUPLICADO
 
+            // Botón Editar (Derecha) - ¡IMPORTANTE MANTENERLO!
             IconButton(onClick = { viewModel.toggleEdit() }) {
                 Icon(
                     imageVector = if (viewModel.isEditable) Icons.Default.Close else Icons.Default.Edit,
@@ -108,7 +136,6 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
 
         Box(
             modifier = Modifier
@@ -141,23 +168,58 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        ProfileTextField("Nombre", viewModel.nombre, { viewModel.onNombreChange(it) }, viewModel.isEditable, LigthPurple)
+// CAMPO NOMBRE (Estilo de Font + Lógica de Dev)
+        ProfileTextField(
+            label = "Nombre",
+            value = viewModel.nombre,
+            onValueChange = { viewModel.onNombreChange(it) },
+            isEnabled = viewModel.isEditable, // <--- IMPORTANTE: Lógica de Dev
+            borderColor = LigthPurple
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        ProfileTextField("Mail", viewModel.mail, { viewModel.onMailChange(it) }, viewModel.isEditable, Color.Gray)
+
+        // CAMPO EMAIL
+        ProfileTextField(
+            label = "Email",
+            value = viewModel.mail,
+            onValueChange = { viewModel.onMailChange(it) },
+            isEnabled = viewModel.isEditable, // <--- IMPORTANTE
+            borderColor = Color.Gray
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        ProfileTextField("ID (no editable)", viewModel.idNoEditable, {}, false, Color.DarkGray)
+        
+        // CAMPO ID
+        ProfileTextField(
+            label = "ID (no editable)",
+            value = viewModel.idNoEditable,
+            onValueChange = {},
+            isEnabled = false,
+            borderColor = Color.Gray
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // BOTÓN GUARDAR
+        // Usamos el 'if' de DEV para que solo salga al editar
         if (viewModel.isEditable) {
             Button(
                 onClick = { viewModel.guardarPerfil() },
-                modifier = Modifier.align(Alignment.End).width(120.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Black),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .width(130.dp)
+                    .height(45.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LigthPurple, // Estilo de Font
+                    contentColor = Color.Black    // Estilo de Font
+                ),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
             ) {
-                Text("Guardar", color = White)
+                Text(
+                    "GUARDAR", 
+                    style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold)
+                )
             }
         }
 
@@ -172,12 +234,15 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
                     (context as? Activity)?.finish()
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp).height(56.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp)
+                .height(56.dp),
             shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red),
+            border = BorderStroke(1.dp, Color.Red),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = White)
         ) {
-            Text("Cerrar sesión", fontSize = 18.sp)
+            Text("CERRAR SESIÓN", fontSize = 18.sp, fontFamily = NunitoFamily)
         }
     }
 }
@@ -189,7 +254,9 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
         onValueChange = onValueChange,
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) },
+
+        textStyle = TextStyle(fontFamily = NunitoFamily),
+        label = { Text(label, fontFamily = NunitoFamily) },
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = LigthPurple,
@@ -205,10 +272,53 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
     )
 }
 
-@Preview(showBackground = true)
+// --- PREVIEWS PARA PERFIL ---
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "Perfil - Diseño Final")
 @Composable
-fun ProfilePreview() {
-    MaccsEventsTheme {
-        Text("Vista previa cargando...", color = Color.White)
+fun PreviewProfileFinal() {
+    val fakeVm = remember {
+        ProfileViewModel().apply {
+            nombre = "Juan Pérez"
+            mail = "juan.perez@example.com"
+        }
+    }
+
+    MaccsEventsTheme(darkTheme = true) {
+        Scaffold(
+            containerColor = Color.Black,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("Mi Perfil",
+                            style = TextStyle(
+                                fontFamily = NunitoFamily,
+                                color = LigthPurple,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+                )
+            },
+            bottomBar = {
+                Surface(
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    color = Color(0xFF121212)
+                ) {
+                    Text("Barra de Navegación",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(16.dp),
+                        fontFamily = NunitoFamily)
+                }
+            }
+        ) { padding ->
+            ProfileScreen(
+                viewModel = fakeVm,
+                modifier = Modifier.padding(padding)
+            )
+        }
     }
 }
