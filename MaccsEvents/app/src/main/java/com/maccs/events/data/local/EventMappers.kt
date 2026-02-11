@@ -15,7 +15,8 @@ fun EventEntity.toDomain(): Event {
         isFavorite = this.isFavorite,
         shortDescription = this.shortDescription,
         longDescription = this.longDescription,
-        isAttending = this.isAttending
+        isAttending = this.isAttending,
+        userId = userId
     )
 }
 
@@ -31,6 +32,7 @@ fun Event.toEntity(): EventEntity {
         isFavorite = this.isFavorite,
         shortDescription = this.shortDescription,
         longDescription = this.longDescription,
-        isAttending = this.isAttending
+        isAttending = this.isAttending,
+        userId = userId
     )
 }

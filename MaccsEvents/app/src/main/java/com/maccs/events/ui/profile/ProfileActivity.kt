@@ -1,14 +1,14 @@
 package com.maccs.events.ui.profile
 
+import ProfileViewModel
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,45 +16,28 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maccs.events.R
 import com.maccs.events.ui.theme.*
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.ui.text.TextStyle
+import com.maccs.events.ui.auth.LoginActivity
 import com.maccs.events.ui.components.AppBottomBar
 import androidx.compose.ui.tooling.preview.Preview
 
-class ProfileViewModel : ViewModel() {
-    var nombre by mutableStateOf("")
-    var mail by mutableStateOf("")
-    val idNoEditable by mutableStateOf("USER-12345")
-    var imageUri by mutableStateOf<Uri?>(null)
-
-    fun onNombreChange(newValue: String) { nombre = newValue }
-    fun onMailChange(newValue: String) { mail = newValue }
-    fun onImageSelected(uri: Uri?) { imageUri = uri }
-    fun guardarPerfil() { println("Guardando: $nombre") }
-    fun cerrarSesion(onSuccess: () -> Unit) {
-        // En el futuro aquí irá Firebase.auth.signOut()
-        println("Sesión cerrada")
-        onSuccess()
-    }
-}
 class ProfileActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,12 +81,8 @@ class ProfileActivity : ComponentActivity() {
 }
 
 @Composable
-fun ProfileScreen(
-    viewModel: ProfileViewModel,
-    modifier: Modifier = Modifier
-) {
+fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> viewModel.onImageSelected(uri) }
@@ -119,7 +98,7 @@ fun ProfileScreen(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Imagen de perfil circular
+        // Imagen de perfil
         Box(
             modifier = Modifier
                 .size(160.dp)
@@ -170,9 +149,10 @@ fun ProfileScreen(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+        
 
         ProfileTextField(
-            label = "ID (no editable)",
+            label = "ID",
             value = viewModel.idNoEditable,
             onValueChange = {},
             isEnabled = false,
@@ -198,9 +178,20 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
+        // BOTÓN CERRAR SESIÓN MODIFICADO
         OutlinedButton(
             onClick = {
                 viewModel.cerrarSesion {
+                    // 1. Preparamos el salto a la pantalla de Login
+                    // NOTA: Si tu clase de Login se llama distinto, cambia "LoginActivity" por el nombre correcto
+                    val intent = Intent(context, com.maccs.events.ui.auth.LoginActivity::class.java)
+
+                    // 2. Limpiamos el historial para que no pueda volver atrás al perfil
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                    context.startActivity(intent)
+
+                    // 3. Cerramos esta pantalla de Perfil definitivamente
                     (context as? Activity)?.finish()
                 }
             },
@@ -218,13 +209,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileTextField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    isEnabled: Boolean,
-    borderColor: Color
-) {
+fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Unit, isEnabled: Boolean, borderColor: Color) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -241,7 +226,7 @@ fun ProfileTextField(
             focusedTextColor = White,
             unfocusedTextColor = White,
             disabledTextColor = Color.Gray,
-            focusedLabelColor = LigthPurple, // El color del texto pequeño arriba
+            focusedLabelColor = LigthPurple,
             unfocusedLabelColor = Color.Gray,
             cursorColor = LigthPurple
         )

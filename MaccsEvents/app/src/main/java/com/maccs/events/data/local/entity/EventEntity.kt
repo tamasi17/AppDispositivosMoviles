@@ -20,5 +20,6 @@ data class EventEntity(
     val isFavorite: Boolean = false,
     val isAttending: Boolean = false,
     val shortDescription: String,
-    val longDescription: String
+    val longDescription: String,
+    val userId: String
 )

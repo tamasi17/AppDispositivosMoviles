@@ -41,4 +41,13 @@ interface EventDao {
     // 5. FAVS
     @Query("SELECT * FROM events WHERE isFavorite = 1 ORDER BY date DESC")
     fun getFavoriteEvents(): Flow<List<EventEntity>>
+
+    // Firebase Versions:
+
+    @Query("SELECT * FROM events WHERE userId = :userId ORDER BY date DESC")
+    fun getEventsForUser(userId: String): Flow<List<EventEntity>>
+
+    // Para Favoritos (también filtrados por usuario, opcional pero recomendado)
+    @Query("SELECT * FROM events WHERE userId = :userId AND isFavorite = 1 ORDER BY date DESC")
+    fun getFavoriteEventsForUser(userId: String): Flow<List<EventEntity>>
 }

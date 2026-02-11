@@ -1,7 +1,10 @@
 package com.maccs.events.ui.event
 
-import android.R
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,31 +14,47 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import java.util.*
+
+// Import your theme elements
 import com.maccs.events.ui.theme.LigthPurple
 import com.maccs.events.ui.theme.MaccsEventsTheme
 import com.maccs.events.ui.theme.NunitoFamily
 
 @Composable
-fun EventFormScreen(viewModel: EventFormViewModel, modifier: Modifier = Modifier) {
+fun EventFormScreen(
+    viewModel: EventFormViewModel,
+    modifier: Modifier = Modifier,
+    onPickImage: () -> Unit // Kept from DEV (needed for functionality)
+) {
     val state by viewModel.uiState.collectAsState()
-
+    val scrollState = rememberScrollState()
+    
+    // We pass the modifier from the Scaffold to handle padding correctly
     EventFormContent(
         state = state,
         onNameChange = { viewModel.onNameChange(it) },
         onLocationChange = { viewModel.onLocationChange(it) },
         onPriceChange = { viewModel.onPriceChange(it) },
         onDescriptionChange = { viewModel.onDescriptionChange(it) },
+        onDateChange = { viewModel.onDateChange(it) }, // Added from DEV
+        onTimeChange = { viewModel.onTimeChange(it) }, // Added from DEV
+        onPickImage = onPickImage,
         onSave = { viewModel.saveEvent() },
-        modifier = modifier // Pasamos el padding recibido del Scaffold de la Activity
+        modifier = modifier
     )
 }
 
@@ -46,120 +65,131 @@ fun EventFormContent(
     onLocationChange: (String) -> Unit,
     onPriceChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onDateChange: (String) -> Unit,
+    onTimeChange: (String) -> Unit,
+    onPickImage: () -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Definimos colores una vez para limpiar el código
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = LigthPurple,
-        unfocusedBorderColor = Color.Gray,
-        focusedLabelColor = LigthPurple,
-        unfocusedLabelColor = Color.LightGray,
-        cursorColor = LigthPurple,
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White
-    )
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+    val scrollState = rememberScrollState()
 
-    // USAMOS COLUMN DIRECTAMENTE (sin otro Scaffold)
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .background(Color.Black) 
+            .verticalScroll(scrollState)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // --- CAMPO NOMBRE ---
-        OutlinedTextField(
+        // --- TITLE (Structure from DEV, Style from FONT) ---
+        Text(
+            text = if (state.isEditing) "Editar Evento" else "Nuevo Evento",
+            fontSize = 28.sp,
+            fontFamily = NunitoFamily, // Added Font
+            fontWeight = FontWeight.Bold,
+            color = LigthPurple // Added Color
+        )
+
+        Text(
+            text = "Define un evento personal o selecciona colaborativo si eres administrador de uno",
+            fontSize = 14.sp,
+            fontFamily = NunitoFamily, // Added Font
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // --- FIELDS (Using the CustomTextField helper from DEV) ---
+        
+        CustomTextField(
             value = state.name,
             onValueChange = onNameChange,
-            label = { Text("Nombre del evento", fontFamily = NunitoFamily) },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(fontFamily = NunitoFamily),
-            colors = textFieldColors
+            label = "Título del evento"
         )
 
-        // --- CAMPO UBICACIÓN ---
-        OutlinedTextField(
+        CustomTextField(
             value = state.location,
             onValueChange = onLocationChange,
-            label = { Text("Ubicación", fontFamily = NunitoFamily) },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(fontFamily = NunitoFamily),
-            colors = textFieldColors
+            label = "Localización"
         )
 
-        // --- CAMPO PRECIO ---
-        OutlinedTextField(
-            value = state.price,
-            onValueChange = onPriceChange,
-            label = { Text("Precio (€)", fontFamily = NunitoFamily) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(fontFamily = NunitoFamily),
-            colors = textFieldColors
-        )
+        // --- DATE & TIME ROW (Logic from DEV) ---
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
 
-        // --- CAMPO DESCRIPCIÓN ---
-        OutlinedTextField(
+            // Date Picker
+            Box(modifier = Modifier.weight(2f)) {
+                CustomTextField(
+                    value = state.date,
+                    onValueChange = { },
+                    label = "dd/MM/yyyy",
+                    readOnly = true
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable {
+                            DatePickerDialog(
+                                context,
+                                { _, year, month, day ->
+                                    val dateFormatted = String.format("%02d/%02d/%04d", day, month + 1, year)
+                                    onDateChange(dateFormatted)
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH)
+                            ).show()
+                        }
+                )
+            }
+
+            // Time Picker
+            Box(modifier = Modifier.weight(1f)) {
+                CustomTextField(
+                    value = state.time,
+                    onValueChange = { },
+                    label = "Hora",
+                    readOnly = true
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable {
+                            TimePickerDialog(
+                                context,
+                                { _, hour, minute ->
+                                    onTimeChange(String.format("%02d:%02d", hour, minute))
+                                },
+                                calendar.get(Calendar.HOUR_OF_DAY),
+                                calendar.get(Calendar.MINUTE),
+                                true
+                            ).show()
+                        }
+                )
+            }
+        }
+
+        CustomTextField(
             value = state.description,
             onValueChange = onDescriptionChange,
-            label = { Text("Descripción", fontFamily = NunitoFamily) },
-            modifier = Modifier.fillMaxWidth(),
-            minLines = 3,
-            textStyle = TextStyle(fontFamily = NunitoFamily),
-            colors = textFieldColors
+            label = "Descripción / notas",
+            modifier = Modifier.height(150.dp),
+            singleLine = false
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // --- IMAGE & PRICE ROW ---
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            CustomButtonField(
+                text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen seleccionada!",
+                modifier = Modifier.weight(1f),
+                onClick = onPickImage
+            )
 
-        Button(
-            onClick = onSave,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = LigthPurple, contentColor = Color.Black),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text("GUARDAR", style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp))
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "Formulario - Nuevo Evento")
-@Composable
-fun PreviewFormNew() {
-    MaccsEventsTheme(darkTheme = false) {
-        // Estado vacío
-        EventFormContent(
-            state = EventFormUiState(),
-            onNameChange = {}, onLocationChange = {}, onPriceChange = {}, onDescriptionChange = {}, onSave = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Formulario - Editando Evento")
-@Composable
-fun PreviewFormEdit() {
-    MaccsEventsTheme(darkTheme = false) {
-        // Estado con datos
-        EventFormContent(
-            state = EventFormUiState(
-                name = "Concierto Jazz",
-                location = "Sala Barco",
-                price = "15.0",
-                description = "Una noche de música relajante."
-            ),
-            onNameChange = {}, onLocationChange = {}, onPriceChange = {}, onDescriptionChange = {}, onSave = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Formulario - Modo Oscuro", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewFormDarkMode() {
-    MaccsEventsTheme (darkTheme = true) {
-        EventFormContent(
-            state = EventFormUiState(name = "Taller de Sushi"),
-            onNameChange = {}, onLocationChange = {}, onPriceChange = {}, onDescriptionChange = {}, onSave = {}
-        )
-    }
-}
+            CustomTextField(
+                value = state.price,
+                onValueChange = onPriceChange,
+                label = "Precio",
+                modifier = Modifier.weight(1f),
+                keyboardType = KeyboardType.Number
+            )

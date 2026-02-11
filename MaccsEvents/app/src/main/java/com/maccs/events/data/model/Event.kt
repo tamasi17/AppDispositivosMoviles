@@ -15,5 +15,6 @@ data class  Event(
     val shortDescription: String,
     val longDescription: String,
     val isFavorite: Boolean = false,
-    val isAttending: Boolean = false
+    val isAttending: Boolean = false,
+    val userId: String
 )

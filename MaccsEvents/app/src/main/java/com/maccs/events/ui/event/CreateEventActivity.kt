@@ -26,6 +26,8 @@ import com.maccs.events.ui.theme.MaccsEventsTheme
 import com.maccs.events.ui.theme.NunitoFamily
 import androidx.compose.material3.ExperimentalMaterial3Api
 
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 class CreateEventActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +40,12 @@ class CreateEventActivity : ComponentActivity() {
             EventFormViewModelFactory(appContainer.eventRepository, eventId)
         }
 
+        val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            // Si el usuario selecciona una imagen, guardamos su URI en el ViewModel
+            if (uri != null) {
+                viewModel.onImageUrlChange(uri.toString())
+            }
+        }
         setContent {
             MaccsEventsTheme(darkTheme = true) {
                 val state by viewModel.uiState.collectAsState()
@@ -70,11 +78,19 @@ class CreateEventActivity : ComponentActivity() {
                     },
                     bottomBar = { AppBottomBar() }
                 ) { innerPadding ->
-                    // Pasamos el modifier con el padding de la TopAppBar
-                    EventFormScreen(
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Surface(
+                        modifier = Modifier.fillMaxSize().padding(innerPadding),
+                        color = Color.Transparent
+
+                    ) {
+                        EventFormScreen(
+                            viewModel = viewModel,
+                            onPickImage = {
+                                // Esta línea lanza el selector de fotos oficial de Android
+                                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            }
+                        )
+                    }
                 }
             }
         }

@@ -2,11 +2,16 @@ package com.maccs.events.data.repository
 
 import com.maccs.events.data.model.Event
 import kotlinx.coroutines.delay
+import kotlin.String
+
+/* Deprecated, kept here for teachers reference.
 
 class FakeDataSource : EventDataSource {
 
     // Lista mutable para poder modificar favoritos/asistencia
     // Al ser una propiedad de la clase, vivirá mientras viva esta instancia
+
+
     private val mockEvents = mutableListOf(
         Event(
             id = "1",
@@ -18,7 +23,7 @@ class FakeDataSource : EventDataSource {
             shortDescription = "El mayor evento de tecnología.",
             longDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
             isFavorite = false,
-            isAttending = true,
+            isAttending = true
         ),
         Event(
             id = "2",
@@ -77,3 +82,5 @@ class FakeDataSource : EventDataSource {
     }
 
 }
+
+ */
