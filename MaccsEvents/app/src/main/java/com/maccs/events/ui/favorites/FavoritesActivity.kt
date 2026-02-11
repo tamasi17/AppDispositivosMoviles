@@ -60,7 +60,12 @@ class FavoritesActivity : ComponentActivity() {
                             style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
                             color = LigthPurple
                         )
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Black,
+                        titleContentColor = LigthPurple,
+                        actionIconContentColor = LigthPurple
+                    )
                 )
             },
             bottomBar = { AppBottomBar() }
