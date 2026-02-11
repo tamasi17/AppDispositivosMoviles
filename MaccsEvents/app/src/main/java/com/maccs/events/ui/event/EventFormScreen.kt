@@ -78,7 +78,7 @@ fun EventFormContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black) 
+            .background(Color.Black)
             .verticalScroll(scrollState)
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -102,7 +102,7 @@ fun EventFormContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         // --- FIELDS (Using the CustomTextField helper from DEV) ---
-        
+
         CustomTextField(
             value = state.name,
             onValueChange = onNameChange,
@@ -116,7 +116,10 @@ fun EventFormContent(
         )
 
         // --- DATE & TIME ROW (Logic from DEV) ---
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
             // Date Picker
             Box(modifier = Modifier.weight(2f)) {
@@ -133,7 +136,8 @@ fun EventFormContent(
                             DatePickerDialog(
                                 context,
                                 { _, year, month, day ->
-                                    val dateFormatted = String.format("%02d/%02d/%04d", day, month + 1, year)
+                                    val dateFormatted =
+                                        String.format("%02d/%02d/%04d", day, month + 1, year)
                                     onDateChange(dateFormatted)
                                 },
                                 calendar.get(Calendar.YEAR),
@@ -179,7 +183,10 @@ fun EventFormContent(
         )
 
         // --- IMAGE & PRICE ROW ---
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             CustomButtonField(
                 text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen seleccionada!",
                 modifier = Modifier.weight(1f),
@@ -193,3 +200,63 @@ fun EventFormContent(
                 modifier = Modifier.weight(1f),
                 keyboardType = KeyboardType.Number
             )
+        }
+    }
+}
+
+
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    borderColor: Color = Color.Gray.copy(alpha = 0.5f),
+    keyboardType: KeyboardType = KeyboardType.Text,
+    singleLine: Boolean = true,
+    readOnly: Boolean = false
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        readOnly = readOnly,
+        // Aplicamos la fuente Nunito al placeholder
+        placeholder = { Text(label, color = Color.Gray, fontFamily = NunitoFamily) },
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = LigthPurple, // Tu color morado
+            unfocusedBorderColor = borderColor,
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            cursorColor = LigthPurple
+        ),
+        // Aplicamos la fuente Nunito al texto que escribes
+        textStyle = TextStyle(fontFamily = NunitoFamily),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        singleLine = singleLine
+    )
+}
+
+@Composable
+fun CustomButtonField(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    OutlinedCard(
+        onClick = onClick,
+        modifier = modifier.height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f)),
+        colors = CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                color = Color.Gray,
+                fontFamily = NunitoFamily // Tu fuente
+            )
+        }
+    }
+}

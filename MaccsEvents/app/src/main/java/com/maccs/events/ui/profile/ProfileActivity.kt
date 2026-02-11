@@ -28,12 +28,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.ui.text.TextStyle
 import com.maccs.events.ui.auth.LoginActivity
@@ -272,53 +272,3 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
     )
 }
 
-// --- PREVIEWS PARA PERFIL ---
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, name = "Perfil - Diseño Final")
-@Composable
-fun PreviewProfileFinal() {
-    val fakeVm = remember {
-        ProfileViewModel().apply {
-            nombre = "Juan Pérez"
-            mail = "juan.perez@example.com"
-        }
-    }
-
-    MaccsEventsTheme(darkTheme = true) {
-        Scaffold(
-            containerColor = Color.Black,
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text("Mi Perfil",
-                            style = TextStyle(
-                                fontFamily = NunitoFamily,
-                                color = LigthPurple,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
-                )
-            },
-            bottomBar = {
-                Surface(
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                    color = Color(0xFF121212)
-                ) {
-                    Text("Barra de Navegación",
-                        color = Color.Gray,
-                        modifier = Modifier.padding(16.dp),
-                        fontFamily = NunitoFamily)
-                }
-            }
-        ) { padding ->
-            ProfileScreen(
-                viewModel = fakeVm,
-                modifier = Modifier.padding(padding)
-            )
-        }
-    }
-}
