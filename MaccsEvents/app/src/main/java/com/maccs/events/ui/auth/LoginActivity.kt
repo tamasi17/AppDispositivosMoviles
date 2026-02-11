@@ -28,6 +28,9 @@ import com.maccs.events.R
 import com.maccs.events.ui.home.HomeActivity
 import com.maccs.events.ui.theme.*
 
+/**
+ * 1. LOGIN ACTIVITY
+ */
 class LoginActivity : ComponentActivity() {
 
     private lateinit var auth: FirebaseAuth
