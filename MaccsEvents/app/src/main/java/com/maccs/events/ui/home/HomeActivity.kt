@@ -145,7 +145,9 @@ class HomeActivity : ComponentActivity() {
                                 value = state.searchQuery,
                                 // Conectamos el input del usuario con el ViewModel
                                 onValueChange = { viewModel.onSearchQueryChanged(it) },
-                                placeholder = { Text("Buscar eventos...", color = Color.Gray) },
+                                placeholder = { Text("Buscar eventos...",
+                                    color = Color.Gray,
+                                    fontFamily = NunitoFamily) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 colors = TextFieldDefaults.colors(
@@ -156,7 +158,7 @@ class HomeActivity : ComponentActivity() {
                                 )
                             )
                         } else {
-                            Text("PRÓXIMOS EVENTOS",
+                            Text("Próximos Eventos",
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontFamily = NunitoFamily,
                                     color = _root_ide_package_.com.maccs.events.ui.theme.LigthPurple,
@@ -199,7 +201,8 @@ class HomeActivity : ComponentActivity() {
                     Text(
                         text = "No hay eventos disponibles",
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color.Gray
+                        color = Color.Gray,
+                        fontFamily = NunitoFamily
                     )
                 } else {
                     LazyColumn(
@@ -261,7 +264,8 @@ class HomeActivity : ComponentActivity() {
                             text = "${event.price} €",
                             modifier = Modifier.padding(8.dp),
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color.Black,
+                            fontFamily = NunitoFamily
                         )
                     }
                 }
@@ -275,9 +279,7 @@ class HomeActivity : ComponentActivity() {
                     ) {
                         Text(
                             text = event.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f)
                         )
                         // BOTÓN FAVORITO
@@ -293,8 +295,7 @@ class HomeActivity : ComponentActivity() {
                     Text(
                         // Usamos shortDescription si existe, o location como fallback visual
                         text = event.shortDescription ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.LightGray,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),                         color = Color.LightGray,
                         maxLines = 1
                     )
 
@@ -315,7 +316,7 @@ class HomeActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = event.location,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily),
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
@@ -327,8 +328,7 @@ class HomeActivity : ComponentActivity() {
                             Text(
                                 text = dateString,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color.Black,
+                                style = MaterialTheme.typography.labelLarge.copy(fontFamily = NunitoFamily),                                 color = Color.Black,
                                 fontWeight = FontWeight.Bold
                             )
                         }
