@@ -7,35 +7,41 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import com.maccs.events.MaccsEventsApp
 import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.theme.LigthPurple
 import com.maccs.events.ui.theme.MaccsEventsTheme
+import com.maccs.events.ui.theme.NunitoFamily
+import androidx.compose.material3.ExperimentalMaterial3Api
 
 class CreateEventActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // 1. Recuperar ID
         val eventId = intent.getStringExtra("EVENT_ID")
-
-        // 2. Crear ViewModel
         val appContainer = (application as MaccsEventsApp).container
         val viewModel: EventFormViewModel by viewModels {
             EventFormViewModelFactory(appContainer.eventRepository, eventId)
         }
 
         setContent {
-            MaccsEventsTheme {
-                // Observar si se ha guardado para cerrar
+            MaccsEventsTheme(darkTheme = true) {
                 val state by viewModel.uiState.collectAsState()
+
                 LaunchedEffect(state.isSaved) {
                     if (state.isSaved) finish()
                 }
@@ -43,18 +49,32 @@ class CreateEventActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.Black,
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    // El título se decide aquí, igual que en Favoritos o Perfil
+                                    text = if (state.name.isEmpty()) "Crear Evento" else "Editar Evento",
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontFamily = NunitoFamily,
+                                        fontWeight = FontWeight.Bold // Ahora será Bold por tu cambio de fuente
+                                    ),
+                                    color = LigthPurple
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = Color.Black,
+                                titleContentColor = LigthPurple
+                            )
+                        )
+                    },
                     bottomBar = { AppBottomBar() }
                 ) { innerPadding ->
-
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        color = Color.Transparent
-                    ) {
-
-                        EventFormScreen(viewModel = viewModel)
-                    }
+                    // Pasamos el modifier con el padding de la TopAppBar
+                    EventFormScreen(
+                        viewModel = viewModel,
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
