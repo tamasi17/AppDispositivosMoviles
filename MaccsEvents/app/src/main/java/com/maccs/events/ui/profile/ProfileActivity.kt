@@ -1,17 +1,23 @@
 package com.maccs.events.ui.profile
 
-import ProfileViewModel
 import android.app.Activity
-import android.content.Intent // Importante para cambiar de pantalla
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,27 +31,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.maccs.events.R
-import com.maccs.events.ui.theme.*
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import coil.compose.AsyncImage
-// Importa tu LoginActivity (ajusta el package si es necesario)
+import android.net.Uri
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.ui.text.TextStyle
 import com.maccs.events.ui.auth.LoginActivity
 import com.maccs.events.ui.components.AppBottomBar
+import androidx.compose.ui.tooling.preview.Preview
+import com.maccs.events.R
+import com.maccs.events.data.local.AppDatabase
+import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.theme.*
 
 class ProfileActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val db = AppDatabase.getDatabase(applicationContext)
+        val userDao = db.userDao()
+
         setContent {
-            // Usamos el ViewModel que ya tiene la lógica de Firebase
-            val profileVm: ProfileViewModel = viewModel()
+            val profileVm: ProfileViewModel = viewModel(
+                factory = ProfileViewModelFactory(userDao)
+            )
+
             MaccsEventsTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Black,
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "Mi Perfil",
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontFamily = NunitoFamily,
+                                        color = LigthPurple,
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = Black,
+                                titleContentColor = LigthPurple
+                            )
+                        )
+                    },
                     bottomBar = { AppBottomBar() }
                 ) { innerPadding ->
                     ProfileScreen(
@@ -66,29 +101,48 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
         onResult = { uri -> viewModel.onImageSelected(uri) }
     )
 
+    // Usamos una Column con scroll por si los campos no caben en pantallas pequeñas
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .background(Black),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Mi Perfil",
-            color = LigthPurple,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
+      
+
+       // Mantenemos la fila de botones, pero quitamos el Título (porque ya está en la barra de arriba)
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 48.dp, bottom = 32.dp)
-        )
+                .padding(top = 24.dp, bottom = 16.dp), // Ajustamos padding ya que hay barra arriba
+            horizontalArrangement = Arrangement.SpaceBetween, // Botones a los extremos
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Botón Settings (Izquierda)
+            IconButton(onClick = { /* Settings - No hace nada aún */ }) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color.White) // Asegura Color.White
+            }
 
-        // Imagen de perfil
+            // AQUÍ BORRAMOS EL TEXTO "MI PERFIL" PARA QUE NO SALGA DUPLICADO
+
+            // Botón Editar (Derecha) - ¡IMPORTANTE MANTENERLO!
+            IconButton(onClick = { viewModel.toggleEdit() }) {
+                Icon(
+                    imageVector = if (viewModel.isEditable) Icons.Default.Close else Icons.Default.Edit,
+                    contentDescription = "Editar",
+                    tint = if (viewModel.isEditable) Color.Red else LigthPurple
+                )
+            }
+        }
+
+
         Box(
             modifier = Modifier
                 .size(160.dp)
                 .clip(CircleShape)
-                .border(2.dp, White, CircleShape)
-                .clickable {
+                .border(2.dp, if (viewModel.isEditable) LigthPurple else White, CircleShape)
+                .clickable(enabled = viewModel.isEditable) {
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
@@ -114,49 +168,81 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        ProfileTextField("Nombre", viewModel.nombre, { viewModel.onNombreChange(it) }, true, LigthPurple)
+// CAMPO NOMBRE (Estilo de Font + Lógica de Dev)
+        ProfileTextField(
+            label = "Nombre",
+            value = viewModel.nombre,
+            onValueChange = { viewModel.onNombreChange(it) },
+            isEnabled = viewModel.isEditable, // <--- IMPORTANTE: Lógica de Dev
+            borderColor = LigthPurple
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        ProfileTextField("Mail", viewModel.mail, { viewModel.onMailChange(it) }, true, Color.Gray)
+
+        // CAMPO EMAIL
+        ProfileTextField(
+            label = "Email",
+            value = viewModel.mail,
+            onValueChange = { viewModel.onMailChange(it) },
+            isEnabled = viewModel.isEditable, // <--- IMPORTANTE
+            borderColor = Color.Gray
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        ProfileTextField("ID (no editable)", viewModel.idNoEditable, {}, false, Color.Gray)
+        
+        // CAMPO ID
+        ProfileTextField(
+            label = "ID (no editable)",
+            value = viewModel.idNoEditable,
+            onValueChange = {},
+            isEnabled = false,
+            borderColor = Color.Gray
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = { viewModel.guardarPerfil() },
-            modifier = Modifier.align(Alignment.End).width(120.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Black),
-            shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
-        ) {
-            Text("Guardar", color = White)
+        // BOTÓN GUARDAR
+        // Usamos el 'if' de DEV para que solo salga al editar
+        if (viewModel.isEditable) {
+            Button(
+                onClick = { viewModel.guardarPerfil() },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .width(130.dp)
+                    .height(45.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LigthPurple, // Estilo de Font
+                    contentColor = Color.Black    // Estilo de Font
+                ),
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                Text(
+                    "GUARDAR", 
+                    style = TextStyle(fontFamily = NunitoFamily, fontWeight = FontWeight.ExtraBold)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // BOTÓN CERRAR SESIÓN MODIFICADO
         OutlinedButton(
             onClick = {
                 viewModel.cerrarSesion {
-                    // 1. Preparamos el salto a la pantalla de Login
-                    // NOTA: Si tu clase de Login se llama distinto, cambia "LoginActivity" por el nombre correcto
                     val intent = Intent(context, com.maccs.events.ui.auth.LoginActivity::class.java)
-
-                    // 2. Limpiamos el historial para que no pueda volver atrás al perfil
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-
                     context.startActivity(intent)
-
-                    // 3. Cerramos esta pantalla de Perfil definitivamente
                     (context as? Activity)?.finish()
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp).height(56.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp)
+                .height(56.dp),
             shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red),
+            border = BorderStroke(1.dp, Color.Red),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = White)
         ) {
-            Text("Cerrar sesión", fontSize = 18.sp)
+            Text("CERRAR SESIÓN", fontSize = 18.sp, fontFamily = NunitoFamily)
         }
     }
 }
@@ -168,7 +254,9 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
         onValueChange = onValueChange,
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) },
+
+        textStyle = TextStyle(fontFamily = NunitoFamily),
+        label = { Text(label, fontFamily = NunitoFamily) },
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = LigthPurple,
@@ -183,3 +271,4 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
         )
     )
 }
+

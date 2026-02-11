@@ -6,7 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -43,6 +46,12 @@ import com.maccs.events.ui.theme.MaccsEventsTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.unit.sp
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
+import androidx.compose.ui.tooling.preview.Preview
+import com.maccs.events.R.drawable.fav_icon_filled
+import com.maccs.events.R.drawable.fav_icon
 
 class HomeActivity : ComponentActivity() {
 
@@ -135,6 +144,7 @@ class HomeActivity : ComponentActivity() {
         val state by viewModel.uiState.collectAsState()
 
         Scaffold(
+            containerColor = Color.Black,
             topBar = {
                 TopAppBar(
                     title = {
@@ -143,7 +153,9 @@ class HomeActivity : ComponentActivity() {
                                 value = state.searchQuery,
                                 // Conectamos el input del usuario con el ViewModel
                                 onValueChange = { viewModel.onSearchQueryChanged(it) },
-                                placeholder = { Text("Buscar eventos...", color = Color.Gray) },
+                                placeholder = { Text("Buscar eventos...",
+                                    color = Color.Gray,
+                                    fontFamily = NunitoFamily) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 colors = TextFieldDefaults.colors(
@@ -154,7 +166,13 @@ class HomeActivity : ComponentActivity() {
                                 )
                             )
                         } else {
-                            Text("PRÓXIMOS EVENTOS", fontWeight = FontWeight.ExtraBold)
+                            Text("Próximos Eventos",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontFamily = NunitoFamily,
+                                    color = LigthPurple,
+                                    fontSize = 24.sp
+                                )
+                            )
                         }
                     },
                     actions = {
@@ -166,14 +184,15 @@ class HomeActivity : ComponentActivity() {
                                     painter = painterResource(id = R.drawable.search_icon_svg),
                                     contentDescription = "Buscar",
                                     modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = LigthPurple
                                 )
                             }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                        containerColor = Color.Black,
+                        titleContentColor = LigthPurple,
+                        actionIconContentColor = LigthPurple
                     )
                 )
             },
@@ -181,7 +200,7 @@ class HomeActivity : ComponentActivity() {
                 AppBottomBar()
             }
         ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            Box(modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.Black)) {
                 if (state.isLoading) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary,
@@ -191,7 +210,8 @@ class HomeActivity : ComponentActivity() {
                     Text(
                         text = "No hay eventos disponibles",
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color.Gray
+                        color = Color.Gray,
+                        fontFamily = NunitoFamily
                     )
                 } else {
                     LazyColumn(
@@ -227,7 +247,7 @@ class HomeActivity : ComponentActivity() {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .clickable { onClick() },
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = Color.Gray
             ),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -245,7 +265,7 @@ class HomeActivity : ComponentActivity() {
                     )
                     // PRECIO
                     Surface(
-                        color = MaterialTheme.colorScheme.primary,
+                        color = LigthPurple,
                         shape = RoundedCornerShape(bottomStart = 8.dp),
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
@@ -253,7 +273,8 @@ class HomeActivity : ComponentActivity() {
                             text = "${event.price} €",
                             modifier = Modifier.padding(8.dp),
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color.Black,
+                            fontFamily = NunitoFamily
                         )
                     }
                 }
@@ -267,26 +288,32 @@ class HomeActivity : ComponentActivity() {
                     ) {
                         Text(
                             text = event.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f)
                         )
                         // BOTÓN FAVORITO
-                        IconButton(onClick = onFavoriteClick) {
+
                             Icon(
-                                imageVector = if (event.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                painter = painterResource(
+                                    id = if (event.isFavorite) fav_icon_filled else fav_icon
+                                ),
                                 contentDescription = "Favorito",
-                                tint = if (event.isFavorite) Color.Red else Color.Gray
+                                tint = if (event.isFavorite) LigthPurple else Color.Gray,
+                                modifier = Modifier
+                                .size(24.dp) // Controlas el tamaño exacto
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null, // ESTO elimina el círculo/onda visual al pulsar
+                                    onClick = onFavoriteClick
+                                )
                             )
-                        }
+
                     }
 
                     Text(
                         // Usamos shortDescription si existe, o location como fallback visual
                         text = event.shortDescription ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.LightGray,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),                         color = Color.LightGray,
                         maxLines = 1
                     )
 
@@ -307,7 +334,7 @@ class HomeActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = event.location,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily),
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
@@ -319,7 +346,7 @@ class HomeActivity : ComponentActivity() {
                             Text(
                                 text = dateString,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelLarge,
+                                style = MaterialTheme.typography.labelLarge.copy(fontFamily = NunitoFamily),
                                 color = Color.Black,
                                 fontWeight = FontWeight.Bold
                             )

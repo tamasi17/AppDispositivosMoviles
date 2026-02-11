@@ -23,11 +23,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.maccs.events.R
 import com.maccs.events.ui.home.HomeActivity
 import com.maccs.events.ui.theme.*
 
+/**
+ * 1. LOGIN ACTIVITY
+ */
 class LoginActivity : ComponentActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -100,9 +108,11 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
 
         Text(
             text = "INICIAR SESIÓN",
-            color = LigthPurple,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = NunitoFamily,
+                fontSize = 26.sp,
+                color = LigthPurple
+            )
         )
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -111,7 +121,7 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email", color = White.copy(alpha = 0.5f)) },
+            label = { Text("Email", color = White.copy(alpha = 0.5f), fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -130,7 +140,7 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña", color = White.copy(alpha = 0.5f)) },
+            label = { Text("Contraseña", color = White.copy(alpha = 0.5f), fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -164,8 +174,8 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
         ) {
             Text(
                 text = "ENTRAR",
+                fontFamily = NunitoFamily,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
             )
         }
 
@@ -176,8 +186,10 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
             Text(
                 text = "¿No tienes cuenta? Regístrate",
                 color = White.copy(alpha = 0.7f),
-                fontSize = 14.sp
+                fontSize = 14.sp,
+                fontFamily = NunitoFamily
             )
         }
     }
 }
+

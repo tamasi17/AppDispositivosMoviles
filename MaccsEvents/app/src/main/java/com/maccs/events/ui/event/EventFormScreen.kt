@@ -1,7 +1,10 @@
 package com.maccs.events.ui.event
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,67 +17,111 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import java.util.*
-import androidx.compose.foundation.clickable
+
+// Import your theme elements
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.MaccsEventsTheme
+import com.maccs.events.ui.theme.NunitoFamily
 
 @Composable
-fun EventFormScreen(viewModel: EventFormViewModel,
-                    onPickImage: () -> Unit) {
+fun EventFormScreen(
+    viewModel: EventFormViewModel,
+    modifier: Modifier = Modifier,
+    onPickImage: () -> Unit // Kept from DEV (needed for functionality)
+) {
     val state by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
+    
+    // We pass the modifier from the Scaffold to handle padding correctly
+    EventFormContent(
+        state = state,
+        onNameChange = { viewModel.onNameChange(it) },
+        onLocationChange = { viewModel.onLocationChange(it) },
+        onPriceChange = { viewModel.onPriceChange(it) },
+        onDescriptionChange = { viewModel.onDescriptionChange(it) },
+        onDateChange = { viewModel.onDateChange(it) }, // Added from DEV
+        onTimeChange = { viewModel.onTimeChange(it) }, // Added from DEV
+        onPickImage = onPickImage,
+        onSave = { viewModel.saveEvent() },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun EventFormContent(
+    state: EventFormUiState,
+    onNameChange: (String) -> Unit,
+    onLocationChange: (String) -> Unit,
+    onPriceChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onDateChange: (String) -> Unit,
+    onTimeChange: (String) -> Unit,
+    onPickImage: () -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+    val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(24.dp)
-            .verticalScroll(scrollState),
+            .verticalScroll(scrollState)
+            .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Título dinámico según el estado
+        // --- TITLE (Structure from DEV, Style from FONT) ---
         Text(
             text = if (state.isEditing) "Editar Evento" else "Nuevo Evento",
             fontSize = 28.sp,
+            fontFamily = NunitoFamily, // Added Font
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF9333EA) // LigthPurple
+            color = LigthPurple // Added Color
         )
 
         Text(
             text = "Define un evento personal o selecciona colaborativo si eres administrador de uno",
             fontSize = 14.sp,
+            fontFamily = NunitoFamily, // Added Font
             color = Color.Gray
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Campo Título
+        // --- FIELDS (Using the CustomTextField helper from DEV) ---
+
         CustomTextField(
             value = state.name,
-            onValueChange = { viewModel.onNameChange(it) },
-            label = "Título del evento",
-            borderColor = Color(0xFF9333EA)
+            onValueChange = onNameChange,
+            label = "Título del evento"
         )
 
-        // Campo Localización
         CustomTextField(
             value = state.location,
-            onValueChange = { viewModel.onLocationChange(it) },
+            onValueChange = onLocationChange,
             label = "Localización"
         )
 
-        // Fila Fecha y Hora
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        // --- DATE & TIME ROW (Logic from DEV) ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
-            // Selector de Fecha
+            // Date Picker
             Box(modifier = Modifier.weight(2f)) {
                 CustomTextField(
                     value = state.date,
@@ -82,7 +129,6 @@ fun EventFormScreen(viewModel: EventFormViewModel,
                     label = "dd/MM/yyyy",
                     readOnly = true
                 )
-                // Capa clicable encima
                 Box(
                     modifier = Modifier
                         .matchParentSize()
@@ -90,9 +136,9 @@ fun EventFormScreen(viewModel: EventFormViewModel,
                             DatePickerDialog(
                                 context,
                                 { _, year, month, day ->
-                                    // Formateamos con %02d para que siempre tenga 2 dígitos (ej: 05/09/2026)
-                                    val dateFormatted = String.format("%02d/%02d/%04d", day, month + 1, year)
-                                    viewModel.onDateChange(dateFormatted)
+                                    val dateFormatted =
+                                        String.format("%02d/%02d/%04d", day, month + 1, year)
+                                    onDateChange(dateFormatted)
                                 },
                                 calendar.get(Calendar.YEAR),
                                 calendar.get(Calendar.MONTH),
@@ -102,7 +148,7 @@ fun EventFormScreen(viewModel: EventFormViewModel,
                 )
             }
 
-            // Selector de Hora
+            // Time Picker
             Box(modifier = Modifier.weight(1f)) {
                 CustomTextField(
                     value = state.time,
@@ -117,7 +163,7 @@ fun EventFormScreen(viewModel: EventFormViewModel,
                             TimePickerDialog(
                                 context,
                                 { _, hour, minute ->
-                                    viewModel.onTimeChange(String.format("%02d:%02d", hour, minute))
+                                    onTimeChange(String.format("%02d:%02d", hour, minute))
                                 },
                                 calendar.get(Calendar.HOUR_OF_DAY),
                                 calendar.get(Calendar.MINUTE),
@@ -128,51 +174,36 @@ fun EventFormScreen(viewModel: EventFormViewModel,
             }
         }
 
-        // Campo Descripción
         CustomTextField(
             value = state.description,
-            onValueChange = { viewModel.onDescriptionChange(it) },
+            onValueChange = onDescriptionChange,
             label = "Descripción / notas",
             modifier = Modifier.height(150.dp),
             singleLine = false
         )
 
-        // Fila Imagen y Precio
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        // --- IMAGE & PRICE ROW ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             CustomButtonField(
                 text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen seleccionada!",
                 modifier = Modifier.weight(1f),
-                onClick = { onPickImage() } // <-- Ahora llama a la galería real
+                onClick = onPickImage
             )
 
             CustomTextField(
                 value = state.price,
-                onValueChange = { viewModel.onPriceChange(it) },
+                onValueChange = onPriceChange,
                 label = "Precio",
                 modifier = Modifier.weight(1f),
                 keyboardType = KeyboardType.Number
             )
         }
-
-
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Botón Guardar
-        Button(
-            onClick = { viewModel.saveEvent() },
-            modifier = Modifier
-                .align(Alignment.End)
-                .width(120.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            border = BorderStroke(1.dp, Color(0xFF9333EA))
-        ) {
-            Text("Guardar", color = Color.White)
-        }
     }
 }
+
 
 @Composable
 fun CustomTextField(
@@ -183,21 +214,25 @@ fun CustomTextField(
     borderColor: Color = Color.Gray.copy(alpha = 0.5f),
     keyboardType: KeyboardType = KeyboardType.Text,
     singleLine: Boolean = true,
-    readOnly: Boolean = false // Añadimos este parámetro
+    readOnly: Boolean = false
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        readOnly = readOnly, // Aplicamos el readOnly aquí
-        placeholder = { Text(label, color = Color.Gray) },
+        readOnly = readOnly,
+        // Aplicamos la fuente Nunito al placeholder
+        placeholder = { Text(label, color = Color.Gray, fontFamily = NunitoFamily) },
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF9333EA),
+            focusedBorderColor = LigthPurple, // Tu color morado
             unfocusedBorderColor = borderColor,
             focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White
+            unfocusedTextColor = Color.White,
+            cursorColor = LigthPurple
         ),
+        // Aplicamos la fuente Nunito al texto que escribes
+        textStyle = TextStyle(fontFamily = NunitoFamily),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         singleLine = singleLine
     )
@@ -207,17 +242,21 @@ fun CustomTextField(
 fun CustomButtonField(
     text: String,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {} // Añadimos el parámetro onClick
+    onClick: () -> Unit = {}
 ) {
     OutlinedCard(
-        onClick = onClick, // Ahora el Card reacciona al click
+        onClick = onClick,
         modifier = modifier.height(56.dp),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f)),
         colors = CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = text, color = Color.Gray)
+            Text(
+                text = text,
+                color = Color.Gray,
+                fontFamily = NunitoFamily // Tu fuente
+            )
         }
     }
 }
