@@ -1,17 +1,23 @@
 package com.maccs.events.ui.profile
 
-import ProfileViewModel
 import android.app.Activity
-import android.content.Intent // Importante para cambiar de pantalla
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,26 +28,29 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.maccs.events.R
-import com.maccs.events.ui.theme.*
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import coil.compose.AsyncImage
-// Importa tu LoginActivity (ajusta el package si es necesario)
-import com.maccs.events.ui.auth.LoginActivity
+import com.maccs.events.R
+import com.maccs.events.data.local.AppDatabase
 import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.theme.*
 
 class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val db = AppDatabase.getDatabase(applicationContext)
+        val userDao = db.userDao()
+
         setContent {
-            // Usamos el ViewModel que ya tiene la lógica de Firebase
-            val profileVm: ProfileViewModel = viewModel()
+            val profileVm: ProfileViewModel = viewModel(
+                factory = ProfileViewModelFactory(userDao)
+            )
+
             MaccsEventsTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -72,23 +81,41 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Mi Perfil",
-            color = LigthPurple,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 48.dp, bottom = 32.dp)
-        )
+                .padding(top = 48.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { /* Settings - No hace nada */ }) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings", tint = White)
+            }
 
-        // Imagen de perfil
+            Text(
+                text = "Mi Perfil",
+                color = LigthPurple,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            IconButton(onClick = { viewModel.toggleEdit() }) {
+                Icon(
+                    imageVector = if (viewModel.isEditable) Icons.Default.Close else Icons.Default.Edit,
+                    contentDescription = "Editar",
+                    tint = if (viewModel.isEditable) Color.Red else LigthPurple
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Box(
             modifier = Modifier
                 .size(160.dp)
                 .clip(CircleShape)
-                .border(2.dp, White, CircleShape)
-                .clickable {
+                .border(2.dp, if (viewModel.isEditable) LigthPurple else White, CircleShape)
+                .clickable(enabled = viewModel.isEditable) {
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
@@ -114,40 +141,34 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        ProfileTextField("Nombre", viewModel.nombre, { viewModel.onNombreChange(it) }, true, LigthPurple)
+        ProfileTextField("Nombre", viewModel.nombre, { viewModel.onNombreChange(it) }, viewModel.isEditable, LigthPurple)
         Spacer(modifier = Modifier.height(16.dp))
-        ProfileTextField("Mail", viewModel.mail, { viewModel.onMailChange(it) }, true, Color.Gray)
+        ProfileTextField("Mail", viewModel.mail, { viewModel.onMailChange(it) }, viewModel.isEditable, Color.Gray)
         Spacer(modifier = Modifier.height(16.dp))
-        ProfileTextField("ID (no editable)", viewModel.idNoEditable, {}, false, Color.Gray)
+        ProfileTextField("ID (no editable)", viewModel.idNoEditable, {}, false, Color.DarkGray)
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = { viewModel.guardarPerfil() },
-            modifier = Modifier.align(Alignment.End).width(120.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Black),
-            shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
-        ) {
-            Text("Guardar", color = White)
+        if (viewModel.isEditable) {
+            Button(
+                onClick = { viewModel.guardarPerfil() },
+                modifier = Modifier.align(Alignment.End).width(120.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Black),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
+            ) {
+                Text("Guardar", color = White)
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // BOTÓN CERRAR SESIÓN MODIFICADO
         OutlinedButton(
             onClick = {
                 viewModel.cerrarSesion {
-                    // 1. Preparamos el salto a la pantalla de Login
-                    // NOTA: Si tu clase de Login se llama distinto, cambia "LoginActivity" por el nombre correcto
                     val intent = Intent(context, com.maccs.events.ui.auth.LoginActivity::class.java)
-
-                    // 2. Limpiamos el historial para que no pueda volver atrás al perfil
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-
                     context.startActivity(intent)
-
-                    // 3. Cerramos esta pantalla de Perfil definitivamente
                     (context as? Activity)?.finish()
                 }
             },
@@ -182,4 +203,12 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
             cursorColor = LigthPurple
         )
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfilePreview() {
+    MaccsEventsTheme {
+        Text("Vista previa cargando...", color = Color.White)
+    }
 }

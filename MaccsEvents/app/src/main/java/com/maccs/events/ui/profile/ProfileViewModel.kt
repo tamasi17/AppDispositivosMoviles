@@ -1,50 +1,88 @@
+package com.maccs.events.ui.profile
+
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import android.net.Uri
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.maccs.events.data.local.dao.UserDao
+import com.maccs.events.data.local.entity.UserEntity
+import kotlinx.coroutines.launch
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
     private val currentUser = auth.currentUser
 
-    // --- CAMBIOS AQUÍ ---
 
-    // 1. El ID sigue siendo automático (es el "DNI" del usuario en Firebase)
-    val idNoEditable by mutableStateOf(currentUser?.uid ?: "Sin ID")
+    val idNoEditable = currentUser?.uid ?: "Sin ID"
 
-    // 2. Nombre y Mail ahora empiezan vacíos (""), no se traen de Firebase
+
     var nombre by mutableStateOf("")
     var mail by mutableStateOf("")
-
-    // 3. La imagen empieza en null (vacía)
     var imageUri by mutableStateOf<Uri?>(null)
 
-    // --- EL RESTO SE MANTIENE IGUAL ---
 
-    fun onNombreChange(newValue: String) {
-        nombre = newValue
+    var isEditable by mutableStateOf(false)
+
+    init {
+        cargarDatosDesdeRoom()
     }
 
-    fun onMailChange(newValue: String) {
-        mail = newValue
+    private fun cargarDatosDesdeRoom() {
+        viewModelScope.launch {
+            val user = userDao.getUserById(idNoEditable)
+            user?.let {
+                nombre = it.name
+                mail = it.email
+                imageUri = it.profileImagePath?.let { path -> Uri.parse(path) }
+            }
+        }
     }
 
-    fun onImageSelected(uri: Uri?) {
-        imageUri = uri
+    fun onNombreChange(newValue: String) { nombre = newValue }
+    fun onMailChange(newValue: String) { mail = newValue }
+    fun onImageSelected(uri: Uri?) { imageUri = uri }
+
+    fun toggleEdit() {
+        if (isEditable) {
+            // Si cancelamos, recargamos los datos originales de la DB
+            cargarDatosDesdeRoom()
+        }
+        isEditable = !isEditable
     }
 
     fun guardarPerfil() {
-        // Al guardar, usaremos el idNoEditable para saber a qué usuario
-        // pertenecen el nombre y mail que ha escrito
-        println("Guardando perfil para ID ${idNoEditable}: $nombre - $mail")
+        viewModelScope.launch {
+            val user = UserEntity(
+                id = idNoEditable,
+                name = nombre,
+                email = mail,
+                profileImagePath = imageUri?.toString()
+            )
+            userDao.insertUser(user)
+            isEditable = false // Bloquear campos tras guardar
+        }
     }
 
     fun cerrarSesion(onSuccess: () -> Unit) {
         auth.signOut()
-        println("Sesión cerrada en Firebase")
         onSuccess()
     }
+}
+
+// Clase necesaria para pasar el UserDao al ViewModel
+class ProfileViewModelFactory(private val userDao: UserDao) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ProfileViewModel(userDao) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+
+
 }
