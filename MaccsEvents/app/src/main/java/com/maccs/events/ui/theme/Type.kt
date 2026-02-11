@@ -5,14 +5,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.R.
 import androidx.compose.ui.text.font.Font
+import com.maccs.events.R.font
 
 // Set of Material typography styles to start with
 // ui/theme/Type.kt
 val NunitoFamily = FontFamily(
-    Font(R.font.nunito_regular, FontWeight.Normal),
-    Font(R.font.nunito_bold, FontWeight.Bold)
+    Font(font.nunito_regular, FontWeight.Normal),
+    Font(font.nunito_regular, FontWeight.Bold)
 )
 
 val Typography = Typography(
