@@ -73,7 +73,7 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
     }
 }
 
-// Clase necesaria para pasar el UserDao al ViewModel
+
 class ProfileViewModelFactory(private val userDao: UserDao) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
