@@ -34,7 +34,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import android.net.Uri
+import androidx.compose.foundation.background
 import com.maccs.events.ui.components.AppBottomBar
+import androidx.compose.ui.tooling.preview.Preview
 
 class ProfileViewModel : ViewModel() {
     var nombre by mutableStateOf("")
@@ -78,8 +80,10 @@ class ProfileActivity : ComponentActivity() {
 
 
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel,
-                  modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    viewModel: ProfileViewModel,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
 
 
@@ -233,4 +237,46 @@ fun ProfileTextField(
             cursorColor = LigthPurple
         )
     )
+}
+
+// --- PREVIEWS PARA PERFIL ---
+
+@Preview(showBackground = true, name = "Perfil - Vista Real")
+@Composable
+fun PreviewProfileDirecta() {
+    // 1. Creamos la instancia manualmente (sin usar viewModel())
+    // Esto evita que busque la base de datos o el motor de Compose
+    val fakeVm = remember {
+        ProfileViewModel().apply {
+            nombre = "Juan Pérez"
+            mail = "juan.perez@example.com"
+        }
+    }
+
+    MaccsEventsTheme(darkTheme = true) {
+        // 2. Forzamos el Scaffold y la Surface a Negro para que no salga blanco
+        Scaffold(
+            containerColor = Color.Black,
+            bottomBar = {
+                // Representación visual de tu AppBottomBar
+                Surface(
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    color = Color(0xFF121212)
+                ) {
+                    Text("Barra de Navegación",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(16.dp),
+                        fontFamily = NunitoFamily)
+                }
+            }
+        ) { padding ->
+            Surface(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                color = Color.Black
+            ) {
+                // Llamamos a tu función original sin cambiarle nada
+                ProfileScreen(viewModel = fakeVm)
+            }
+        }
+    }
 }
