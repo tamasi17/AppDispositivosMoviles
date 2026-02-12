@@ -1,10 +1,7 @@
 package com.maccs.events.ui.event
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,108 +14,67 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import androidx.compose.ui.platform.LocalContext
 import java.util.*
-
-// Import your theme elements
-import com.maccs.events.ui.theme.LigthPurple
-import com.maccs.events.ui.theme.MaccsEventsTheme
-import com.maccs.events.ui.theme.NunitoFamily
+import androidx.compose.foundation.clickable
 
 @Composable
-fun EventFormScreen(
-    viewModel: EventFormViewModel,
-    modifier: Modifier = Modifier,
-    onPickImage: () -> Unit // Kept from DEV (needed for functionality)
-) {
+fun EventFormScreen(viewModel: EventFormViewModel,
+                    onPickImage: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
-    
-    // We pass the modifier from the Scaffold to handle padding correctly
-    EventFormContent(
-        state = state,
-        onNameChange = { viewModel.onNameChange(it) },
-        onLocationChange = { viewModel.onLocationChange(it) },
-        onPriceChange = { viewModel.onPriceChange(it) },
-        onDescriptionChange = { viewModel.onDescriptionChange(it) },
-        onDateChange = { viewModel.onDateChange(it) }, // Added from DEV
-        onTimeChange = { viewModel.onTimeChange(it) }, // Added from DEV
-        onPickImage = onPickImage,
-        onSave = { viewModel.saveEvent() },
-        modifier = modifier
-    )
-}
-
-@Composable
-fun EventFormContent(
-    state: EventFormUiState,
-    onNameChange: (String) -> Unit,
-    onLocationChange: (String) -> Unit,
-    onPriceChange: (String) -> Unit,
-    onDescriptionChange: (String) -> Unit,
-    onDateChange: (String) -> Unit,
-    onTimeChange: (String) -> Unit,
-    onPickImage: () -> Unit,
-    onSave: () -> Unit,
-    modifier: Modifier = Modifier
-) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    val scrollState = rememberScrollState()
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black) 
-            .verticalScroll(scrollState)
-            .padding(24.dp),
+            .background(Color.Black)
+            .padding(24.dp)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // --- TITLE (Structure from DEV, Style from FONT) ---
+        // Título dinámico según el estado
         Text(
             text = if (state.isEditing) "Editar Evento" else "Nuevo Evento",
             fontSize = 28.sp,
-            fontFamily = NunitoFamily, // Added Font
             fontWeight = FontWeight.Bold,
-            color = LigthPurple // Added Color
+            color = Color(0xFF9333EA) // LigthPurple
         )
 
         Text(
             text = "Define un evento personal o selecciona colaborativo si eres administrador de uno",
             fontSize = 14.sp,
-            fontFamily = NunitoFamily, // Added Font
             color = Color.Gray
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // --- FIELDS (Using the CustomTextField helper from DEV) ---
-        
+        // Campo Título
         CustomTextField(
             value = state.name,
-            onValueChange = onNameChange,
-            label = "Título del evento"
+            onValueChange = { viewModel.onNameChange(it) },
+            label = "Título del evento",
+            borderColor = Color(0xFF9333EA)
         )
 
+        // Campo Localización
         CustomTextField(
             value = state.location,
-            onValueChange = onLocationChange,
+            onValueChange = { viewModel.onLocationChange(it) },
             label = "Localización"
         )
 
-        // --- DATE & TIME ROW (Logic from DEV) ---
+        // Fila Fecha y Hora
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
 
-            // Date Picker
+            // Selector de Fecha
             Box(modifier = Modifier.weight(2f)) {
                 CustomTextField(
                     value = state.date,
@@ -126,6 +82,7 @@ fun EventFormContent(
                     label = "dd/MM/yyyy",
                     readOnly = true
                 )
+                // Capa clicable encima
                 Box(
                     modifier = Modifier
                         .matchParentSize()
@@ -133,8 +90,9 @@ fun EventFormContent(
                             DatePickerDialog(
                                 context,
                                 { _, year, month, day ->
+                                    // Formateamos con %02d para que siempre tenga 2 dígitos (ej: 05/09/2026)
                                     val dateFormatted = String.format("%02d/%02d/%04d", day, month + 1, year)
-                                    onDateChange(dateFormatted)
+                                    viewModel.onDateChange(dateFormatted)
                                 },
                                 calendar.get(Calendar.YEAR),
                                 calendar.get(Calendar.MONTH),
@@ -144,7 +102,7 @@ fun EventFormContent(
                 )
             }
 
-            // Time Picker
+            // Selector de Hora
             Box(modifier = Modifier.weight(1f)) {
                 CustomTextField(
                     value = state.time,
@@ -159,7 +117,7 @@ fun EventFormContent(
                             TimePickerDialog(
                                 context,
                                 { _, hour, minute ->
-                                    onTimeChange(String.format("%02d:%02d", hour, minute))
+                                    viewModel.onTimeChange(String.format("%02d:%02d", hour, minute))
                                 },
                                 calendar.get(Calendar.HOUR_OF_DAY),
                                 calendar.get(Calendar.MINUTE),
@@ -170,26 +128,96 @@ fun EventFormContent(
             }
         }
 
+        // Campo Descripción
         CustomTextField(
             value = state.description,
-            onValueChange = onDescriptionChange,
+            onValueChange = { viewModel.onDescriptionChange(it) },
             label = "Descripción / notas",
             modifier = Modifier.height(150.dp),
             singleLine = false
         )
 
-        // --- IMAGE & PRICE ROW ---
+        // Fila Imagen y Precio
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             CustomButtonField(
                 text = if (state.imageUrl.isEmpty()) "Imagen" else "¡Imagen seleccionada!",
                 modifier = Modifier.weight(1f),
-                onClick = onPickImage
+                onClick = { onPickImage() } // <-- Ahora llama a la galería real
             )
 
             CustomTextField(
                 value = state.price,
-                onValueChange = onPriceChange,
+                onValueChange = { viewModel.onPriceChange(it) },
                 label = "Precio",
                 modifier = Modifier.weight(1f),
                 keyboardType = KeyboardType.Number
             )
+        }
+
+
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Botón Guardar
+        Button(
+            onClick = { viewModel.saveEvent() },
+            modifier = Modifier
+                .align(Alignment.End)
+                .width(120.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            border = BorderStroke(1.dp, Color(0xFF9333EA))
+        ) {
+            Text("Guardar", color = Color.White)
+        }
+    }
+}
+
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    borderColor: Color = Color.Gray.copy(alpha = 0.5f),
+    keyboardType: KeyboardType = KeyboardType.Text,
+    singleLine: Boolean = true,
+    readOnly: Boolean = false // Añadimos este parámetro
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        readOnly = readOnly, // Aplicamos el readOnly aquí
+        placeholder = { Text(label, color = Color.Gray) },
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFF9333EA),
+            unfocusedBorderColor = borderColor,
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        singleLine = singleLine
+    )
+}
+
+@Composable
+fun CustomButtonField(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {} // Añadimos el parámetro onClick
+) {
+    OutlinedCard(
+        onClick = onClick, // Ahora el Card reacciona al click
+        modifier = modifier.height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f)),
+        colors = CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = text, color = Color.Gray)
+        }
+    }
+}
