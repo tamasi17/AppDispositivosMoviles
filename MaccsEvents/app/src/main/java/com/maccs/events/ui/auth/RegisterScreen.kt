@@ -69,7 +69,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
         // Campos usando el estilo de tu login
         OutlinedTextField(
             value = name, onValueChange = { name = it },
-            label = { Text("Nombre Completo") },
+            label = { Text("Nombre Completo", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LigthPurple, unfocusedTextColor = White, focusedTextColor = White)
         )
@@ -78,7 +78,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
 
         OutlinedTextField(
             value = email, onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text("Email", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LigthPurple, unfocusedTextColor = White, focusedTextColor = White)
         )
@@ -87,7 +87,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
 
         OutlinedTextField(
             value = password, onValueChange = { password = it },
-            label = { Text("Contraseña") },
+            label = { Text("Contraseña", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LigthPurple, unfocusedTextColor = White, focusedTextColor = White)
@@ -103,7 +103,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = LigthPurple)
             ) {
-                Text("REGISTRARSE", fontWeight = FontWeight.Bold)
+                Text("REGISTRARSE", fontWeight = FontWeight.Bold, fontFamily = NunitoFamily)
             }
         }
     }
