@@ -95,8 +95,8 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
             Text(
                 text = "Mi Perfil",
                 color = LigthPurple,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontSize = 24.sp,
+                style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily)
             )
 
             IconButton(onClick = { viewModel.toggleEdit() }) {
@@ -157,7 +157,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
                 shape = RoundedCornerShape(12.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
             ) {
-                Text("Guardar", color = White)
+                Text("Guardar", color = White, fontFamily = NunitoFamily)
             }
         }
 
@@ -177,7 +177,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
             border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = White)
         ) {
-            Text("Cerrar sesión", fontSize = 18.sp)
+            Text("Cerrar sesión", fontSize = 18.sp, fontFamily = NunitoFamily)
         }
     }
 }
@@ -189,7 +189,7 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
         onValueChange = onValueChange,
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) },
+        label = { Text(label, fontFamily = NunitoFamily) },
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = LigthPurple,
@@ -209,6 +209,6 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
 @Composable
 fun ProfilePreview() {
     MaccsEventsTheme {
-        Text("Vista previa cargando...", color = Color.White)
+        Text("Vista previa cargando...", color = Color.White, fontFamily = NunitoFamily)
     }
 }
