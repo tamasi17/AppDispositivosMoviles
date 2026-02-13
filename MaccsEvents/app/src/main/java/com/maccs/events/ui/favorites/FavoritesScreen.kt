@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.clip
 import com.maccs.events.R
 import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.theme.NunitoFamily
 
 @Composable
 fun FavoritesScreen(modifier: Modifier = Modifier) {
@@ -44,15 +45,15 @@ fun FavoritesScreen(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
             // CAMBIO: Ahora usa el fondo del tema (blanco en light, negro en dark)
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color.Black)
             .padding(16.dp)
     ) {
         Text(
             text = "Mis Favoritos",
             // CAMBIO: Color morado por defecto del tema
             color = LigthPurple,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp,
+            fontFamily = NunitoFamily,
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
@@ -62,7 +63,8 @@ fun FavoritesScreen(modifier: Modifier = Modifier) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     text = "Aún no tienes eventos favoritos",
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = NunitoFamily)
                 )
             }
         } else {

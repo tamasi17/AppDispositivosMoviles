@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import com.maccs.events.MaccsEventsApp
 import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.home.EventCard // Reusing your existing component
+import com.maccs.events.ui.theme.LigthPurple
 import com.maccs.events.ui.theme.MaccsEventsTheme
+import com.maccs.events.ui.theme.NunitoFamily
 
 class FavoritesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +50,10 @@ class FavoritesActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Mis Favoritos", fontWeight = FontWeight.Bold) },
+                    title = { Text("Mis Favoritos", fontFamily = NunitoFamily) },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                        containerColor = Color.Black,
+                        titleContentColor = LigthPurple
                     )
                 )
             },
@@ -70,7 +72,7 @@ class FavoritesActivity : ComponentActivity() {
                     ) {
                         Text(
                             text = "No tienes favoritos aún",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = NunitoFamily),
                             color = Color.Gray
                         )
                     }
