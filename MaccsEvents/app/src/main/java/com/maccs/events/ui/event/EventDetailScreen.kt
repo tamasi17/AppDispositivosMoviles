@@ -27,7 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,8 +57,8 @@ fun EventDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("¿Borrar evento?") },
-            text = { Text("Esta acción no se puede deshacer.") },
+            title = { Text("¿Borrar evento?", fontFamily = NunitoFamily) },
+            text = { Text("Esta acción no se puede deshacer.", fontFamily = NunitoFamily) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -66,12 +67,12 @@ fun EventDetailScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                 ) {
-                    Text("Borrar")
+                    Text("Borrar", fontFamily = NunitoFamily)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancelar")
+                    Text("Cancelar", fontFamily = NunitoFamily)
                 }
             }
         )
@@ -79,7 +80,7 @@ fun EventDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle del Evento") },
+                title = { Text("Detalle del Evento", fontFamily = NunitoFamily, color = LigthPurple) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
@@ -120,7 +121,7 @@ fun EventDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text("Error al cargar el evento")
-                        Text(text = state.message, style = MaterialTheme.typography.bodySmall, color = Color.Red)
+                        Text(text = state.message, style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily), color = Color.Red)
                     }
                 }
                 is EventDetailUiState.Success -> {
@@ -149,7 +150,7 @@ fun EventDetailScreen(
                             // Título
                             Text(
                                 text = event.name,
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -165,7 +166,7 @@ fun EventDetailScreen(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = event.location,
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontFamily = NunitoFamily),
                                     color = MaterialTheme.colorScheme.secondary
                                 )
                             }
@@ -175,13 +176,13 @@ fun EventDetailScreen(
                             // Descripción
                             Text(
                                 text = "Descripción",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
                                 fontWeight = FontWeight.SemiBold
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = event.longDescription,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),
                                 lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
                             )
 
@@ -203,7 +204,7 @@ fun EventDetailScreen(
                                         tint = if (event.isFavorite) Color.Red else MaterialTheme.colorScheme.primary
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(if (event.isFavorite) "Quitar" else "Favorito")
+                                    Text(if (event.isFavorite) "Quitar" else "Favorito", fontFamily = NunitoFamily)
                                 }
 
                                 // Botón Asistir (Placeholder visual)
@@ -211,7 +212,7 @@ fun EventDetailScreen(
                                     onClick = { /* Lógica asistir */ },
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Asistiré")
+                                    Text("Asistiré", fontFamily = NunitoFamily)
                                 }
                             }
                         }
