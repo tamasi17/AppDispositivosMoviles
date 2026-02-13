@@ -23,6 +23,8 @@ import android.app.TimePickerDialog
 import androidx.compose.ui.platform.LocalContext
 import java.util.*
 import androidx.compose.foundation.clickable
+import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.NunitoFamily
 
 @Composable
 fun EventFormScreen(viewModel: EventFormViewModel,
@@ -45,13 +47,15 @@ fun EventFormScreen(viewModel: EventFormViewModel,
             text = if (state.isEditing) "Editar Evento" else "Nuevo Evento",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF9333EA) // LigthPurple
+            color = LigthPurple,
+            fontFamily = NunitoFamily
         )
 
         Text(
             text = "Define un evento personal o selecciona colaborativo si eres administrador de uno",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = Color.Gray,
+            fontFamily = NunitoFamily
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -169,7 +173,7 @@ fun EventFormScreen(viewModel: EventFormViewModel,
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             border = BorderStroke(1.dp, Color(0xFF9333EA))
         ) {
-            Text("Guardar", color = Color.White)
+            Text("Guardar", color = Color.White, fontFamily = NunitoFamily)
         }
     }
 }
@@ -189,7 +193,7 @@ fun CustomTextField(
         value = value,
         onValueChange = onValueChange,
         readOnly = readOnly, // Aplicamos el readOnly aquí
-        placeholder = { Text(label, color = Color.Gray) },
+        placeholder = { Text(label, color = Color.Gray, fontFamily = NunitoFamily) },
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
@@ -217,7 +221,7 @@ fun CustomButtonField(
         colors = CardDefaults.outlinedCardColors(containerColor = Color.Transparent)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = text, color = Color.Gray)
+            Text(text = text, color = Color.Gray, fontFamily = NunitoFamily)
         }
     }
 }
