@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.isSystemInDarkTheme
-import com.maccs.events.ui.theme.LigthPurple
-import android.content.Intent
+import com.maccs.events.ui.theme.LightPurple
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,9 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.maccs.events.data.Evento
 import com.maccs.events.data.EventoRepository
-import com.maccs.events.ui.event.CreateEventActivity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.draw.clip
 import com.maccs.events.R
 import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.theme.NunitoFamily
@@ -51,7 +48,7 @@ fun FavoritesScreen(modifier: Modifier = Modifier) {
         Text(
             text = "Mis Favoritos",
             // CAMBIO: Color morado por defecto del tema
-            color = LigthPurple,
+            color = LightPurple,
             fontSize = 24.sp,
             fontFamily = NunitoFamily,
             modifier = Modifier.padding(vertical = 8.dp)
@@ -113,7 +110,7 @@ fun EventoFavoritoCard(evento: Evento, onCardClick: () -> Unit, onRemoveClick: (
                             painter = painterResource(id = R.drawable.fav_icon_filled),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
-                            tint = LigthPurple
+                            tint = LightPurple
                         )
                     }
                 }

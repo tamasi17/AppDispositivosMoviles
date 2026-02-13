@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.LightPurple
 import com.maccs.events.ui.navigation.NavigationItem
 
 @Composable
@@ -40,7 +40,7 @@ fun AppBottomBar() {
             .padding(8.dp) // Añadimos padding para que se vea el redondeado inferior
             .border(
                 width = 2.dp,
-                color = LigthPurple,
+                color = LightPurple,
                 shape = barShape    // <--- ESTO REDONDEA EL BORDE
             )
             .clip(barShape),        // <--- ESTO REDONDEA EL CONTENIDO/FONDO
@@ -63,7 +63,7 @@ fun AppBottomBar() {
                             .size(40.dp)
                             .padding(horizontal = 2.dp),
                         tint = if (isSelected) {
-                            LigthPurple
+                            LightPurple
                         } else {
                             if (isDark) Color.White else Color.Black
                         }

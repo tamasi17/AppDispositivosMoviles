@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.LightPurple
 import com.maccs.events.ui.theme.NunitoFamily
 
 
@@ -80,7 +80,7 @@ fun EventDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle del Evento", fontFamily = NunitoFamily, color = LigthPurple) },
+                title = { Text("Detalle del Evento", fontFamily = NunitoFamily, color = LightPurple) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")

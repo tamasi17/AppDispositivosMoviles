@@ -1,6 +1,5 @@
 package com.maccs.events.ui.home
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,7 +38,7 @@ import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.event.EventDetailScreen
 import com.maccs.events.ui.event.EventDetailViewModel
 import com.maccs.events.ui.event.EventDetailViewModelFactory
-import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.LightPurple
 import com.maccs.events.ui.theme.MaccsEventsTheme
 import com.maccs.events.ui.theme.NunitoFamily
 import java.text.SimpleDateFormat
@@ -158,7 +157,7 @@ class HomeActivity : ComponentActivity() {
                         } else {
                             Text("Próximos Eventos",
                                     style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily,
-                                    color = LigthPurple))
+                                    color = LightPurple))
                         }
                     },
                     actions = {
@@ -250,7 +249,7 @@ class HomeActivity : ComponentActivity() {
                     )
                     // PRECIO
                     Surface(
-                        color = LigthPurple,
+                        color = LightPurple,
                         shape = RoundedCornerShape(bottomStart = 8.dp),
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {

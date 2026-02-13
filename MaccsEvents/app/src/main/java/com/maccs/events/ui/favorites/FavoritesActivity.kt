@@ -1,6 +1,5 @@
 package com.maccs.events.ui.favorites
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,12 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.maccs.events.MaccsEventsApp
 import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.home.EventCard // Reusing your existing component
-import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.LightPurple
 import com.maccs.events.ui.theme.MaccsEventsTheme
 import com.maccs.events.ui.theme.NunitoFamily
 
@@ -53,7 +51,7 @@ class FavoritesActivity : ComponentActivity() {
                     title = { Text("Mis Favoritos", fontFamily = NunitoFamily) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Black,
-                        titleContentColor = LigthPurple
+                        titleContentColor = LightPurple
                     )
                 )
             },

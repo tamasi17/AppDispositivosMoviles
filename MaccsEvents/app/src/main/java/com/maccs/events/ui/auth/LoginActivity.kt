@@ -103,7 +103,7 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
 
         Text(
             text = "INICIAR SESIÓN",
-            color = LigthPurple,
+            color = LightPurple,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = NunitoFamily
@@ -119,11 +119,11 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = LigthPurple,
+                focusedBorderColor = LightPurple,
                 unfocusedBorderColor = White.copy(alpha = 0.3f),
                 focusedTextColor = White,
                 unfocusedTextColor = White,
-                cursorColor = LigthPurple
+                cursorColor = LightPurple
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
@@ -139,11 +139,11 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = LigthPurple,
+                focusedBorderColor = LightPurple,
                 unfocusedBorderColor = White.copy(alpha = 0.3f),
                 focusedTextColor = White,
                 unfocusedTextColor = White,
-                cursorColor = LigthPurple
+                cursorColor = LightPurple
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
@@ -161,7 +161,7 @@ fun LoginScreen(onLoginClick: (String, String) -> Unit,
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = LigthPurple,
+                containerColor = LightPurple,
                 contentColor = White
             ),
             shape = MaterialTheme.shapes.medium

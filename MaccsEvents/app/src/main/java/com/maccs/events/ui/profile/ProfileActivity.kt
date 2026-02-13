@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,7 +93,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
 
             Text(
                 text = "Mi Perfil",
-                color = LigthPurple,
+                color = LightPurple,
                 fontSize = 24.sp,
                 style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily)
             )
@@ -103,7 +102,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
                 Icon(
                     imageVector = if (viewModel.isEditable) Icons.Default.Close else Icons.Default.Edit,
                     contentDescription = "Editar",
-                    tint = if (viewModel.isEditable) Color.Red else LigthPurple
+                    tint = if (viewModel.isEditable) Color.Red else LightPurple
                 )
             }
         }
@@ -114,7 +113,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(160.dp)
                 .clip(CircleShape)
-                .border(2.dp, if (viewModel.isEditable) LigthPurple else White, CircleShape)
+                .border(2.dp, if (viewModel.isEditable) LightPurple else White, CircleShape)
                 .clickable(enabled = viewModel.isEditable) {
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -141,7 +140,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        ProfileTextField("Nombre", viewModel.nombre, { viewModel.onNombreChange(it) }, viewModel.isEditable, LigthPurple)
+        ProfileTextField("Nombre", viewModel.nombre, { viewModel.onNombreChange(it) }, viewModel.isEditable, LightPurple)
         Spacer(modifier = Modifier.height(16.dp))
         ProfileTextField("Mail", viewModel.mail, { viewModel.onMailChange(it) }, viewModel.isEditable, Color.Gray)
         Spacer(modifier = Modifier.height(16.dp))
@@ -155,7 +154,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, modifier: Modifier = Modifier) {
                 modifier = Modifier.align(Alignment.End).width(120.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Black),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, LigthPurple)
+                border = androidx.compose.foundation.BorderStroke(1.dp, LightPurple)
             ) {
                 Text("Guardar", color = White, fontFamily = NunitoFamily)
             }
@@ -192,15 +191,15 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
         label = { Text(label, fontFamily = NunitoFamily) },
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = LigthPurple,
+            focusedBorderColor = LightPurple,
             unfocusedBorderColor = if (isEnabled) borderColor else Color.DarkGray,
             disabledBorderColor = Color.DarkGray,
             focusedTextColor = White,
             unfocusedTextColor = White,
             disabledTextColor = Color.Gray,
-            focusedLabelColor = LigthPurple,
+            focusedLabelColor = LightPurple,
             unfocusedLabelColor = Color.Gray,
-            cursorColor = LigthPurple
+            cursorColor = LightPurple
         )
     )
 }

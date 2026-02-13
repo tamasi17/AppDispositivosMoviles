@@ -60,7 +60,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             if (imageUri != null) {
                 AsyncImage(model = imageUri, contentDescription = null, contentScale = ContentScale.Crop)
             } else {
-                Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = LigthPurple)
+                Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = LightPurple)
             }
         }
 
@@ -71,7 +71,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             value = name, onValueChange = { name = it },
             label = { Text("Nombre Completo", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LigthPurple, unfocusedTextColor = White, focusedTextColor = White)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -80,7 +80,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             value = email, onValueChange = { email = it },
             label = { Text("Email", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LigthPurple, unfocusedTextColor = White, focusedTextColor = White)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -90,18 +90,18 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             label = { Text("Contraseña", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LigthPurple, unfocusedTextColor = White, focusedTextColor = White)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         if (state is RegisterUiState.Loading) {
-            CircularProgressIndicator(color = LigthPurple)
+            CircularProgressIndicator(color = LightPurple)
         } else {
             Button(
                 onClick = { viewModel.onRegister(context, email, password, name, imageUri) },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = LigthPurple)
+                colors = ButtonDefaults.buttonColors(containerColor = LightPurple)
             ) {
                 Text("REGISTRARSE", fontWeight = FontWeight.Bold, fontFamily = NunitoFamily)
             }

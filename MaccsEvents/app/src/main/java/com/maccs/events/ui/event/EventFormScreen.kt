@@ -23,7 +23,7 @@ import android.app.TimePickerDialog
 import androidx.compose.ui.platform.LocalContext
 import java.util.*
 import androidx.compose.foundation.clickable
-import com.maccs.events.ui.theme.LigthPurple
+import com.maccs.events.ui.theme.LightPurple
 import com.maccs.events.ui.theme.NunitoFamily
 
 @Composable
@@ -47,7 +47,7 @@ fun EventFormScreen(viewModel: EventFormViewModel,
             text = if (state.isEditing) "Editar Evento" else "Nuevo Evento",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = LigthPurple,
+            color = LightPurple,
             fontFamily = NunitoFamily
         )
 
