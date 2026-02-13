@@ -39,7 +39,9 @@ import com.maccs.events.ui.components.AppBottomBar
 import com.maccs.events.ui.event.EventDetailScreen
 import com.maccs.events.ui.event.EventDetailViewModel
 import com.maccs.events.ui.event.EventDetailViewModelFactory
+import com.maccs.events.ui.theme.LigthPurple
 import com.maccs.events.ui.theme.MaccsEventsTheme
+import com.maccs.events.ui.theme.NunitoFamily
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -154,7 +156,9 @@ class HomeActivity : ComponentActivity() {
                                 )
                             )
                         } else {
-                            Text("PRÓXIMOS EVENTOS", fontWeight = FontWeight.ExtraBold)
+                            Text("Próximos Eventos",
+                                    style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily,
+                                    color = LigthPurple))
                         }
                     },
                     actions = {
@@ -191,7 +195,8 @@ class HomeActivity : ComponentActivity() {
                     Text(
                         text = "No hay eventos disponibles",
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color.Gray
+                        color = Color.Gray,
+                        fontFamily = NunitoFamily
                     )
                 } else {
                     LazyColumn(
@@ -245,7 +250,7 @@ class HomeActivity : ComponentActivity() {
                     )
                     // PRECIO
                     Surface(
-                        color = MaterialTheme.colorScheme.primary,
+                        color = LigthPurple,
                         shape = RoundedCornerShape(bottomStart = 8.dp),
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
@@ -267,7 +272,7 @@ class HomeActivity : ComponentActivity() {
                     ) {
                         Text(
                             text = event.name,
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f)
@@ -285,7 +290,7 @@ class HomeActivity : ComponentActivity() {
                     Text(
                         // Usamos shortDescription si existe, o location como fallback visual
                         text = event.shortDescription ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),
                         color = Color.LightGray,
                         maxLines = 1
                     )
@@ -307,7 +312,7 @@ class HomeActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = event.location,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = NunitoFamily),
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
@@ -319,7 +324,7 @@ class HomeActivity : ComponentActivity() {
                             Text(
                                 text = dateString,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelLarge,
+                                style = MaterialTheme.typography.labelLarge.copy(fontFamily = NunitoFamily),
                                 color = Color.Black,
                                 fontWeight = FontWeight.Bold
                             )

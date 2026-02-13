@@ -26,6 +26,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.maccs.events.data.model.Event
 import com.maccs.events.ui.components.AppBottomBar
+import com.maccs.events.ui.theme.NunitoFamily
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -91,7 +92,7 @@ fun EmptyStateMessage(isSearching: Boolean) {
     ) {
         Text(
             text = if (isSearching) "No se encontraron eventos" else "No hay eventos disponibles",
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = NunitoFamily),
             color = Color.Gray
         )
     }
@@ -111,7 +112,7 @@ fun HomeTopBar(
                 TextField(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
-                    placeholder = { Text("Buscar eventos...") },
+                    placeholder = { Text("Buscar eventos...", fontFamily = NunitoFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = TextFieldDefaults.colors(
@@ -122,7 +123,7 @@ fun HomeTopBar(
                     )
                 )
             } else {
-                Text("Maccs Events", fontWeight = FontWeight.Bold)
+                Text("Maccs Events", fontFamily = NunitoFamily)
             }
         },
         actions = {
@@ -180,7 +181,7 @@ fun EventCard(
                     Text(
                         text = "${event.price} €",
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.labelLarge.copy(fontFamily = NunitoFamily),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -199,7 +200,7 @@ fun EventCard(
                 ) {
                     Text(
                         text = event.name,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         modifier = Modifier.weight(1f)
@@ -229,7 +230,7 @@ fun EventCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "${event.location} • $formattedDate",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = NunitoFamily),
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
