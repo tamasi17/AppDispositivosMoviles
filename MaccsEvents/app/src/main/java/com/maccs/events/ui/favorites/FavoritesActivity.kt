@@ -46,6 +46,7 @@ class FavoritesActivity : ComponentActivity() {
         val favorites by viewModel.favorites.collectAsState()
 
         Scaffold(
+            containerColor = Color.Black,
             topBar = {
                 TopAppBar(
                     title = { Text("Mis Favoritos", style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily)) },
@@ -69,7 +70,7 @@ class FavoritesActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "No tienes favoritos aún",
+                            text = "No tienes favoritos todavía",
                             style = MaterialTheme.typography.bodyLarge.copy(fontFamily = NunitoFamily),
                             color = Color.Gray
                         )

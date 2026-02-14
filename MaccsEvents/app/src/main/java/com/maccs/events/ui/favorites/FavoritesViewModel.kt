@@ -12,9 +12,8 @@ import kotlinx.coroutines.launch
 
 class FavoritesViewModel(private val repository: EventRepository) : ViewModel() {
 
-    // Converts the Flow from Room into a StateFlow.
-    // WhileSubscribed(5000) keeps the upstream active for 5s after the UI stops observing
-    // (e.g., rotation), preventing unnecessary database restarts.
+    // CORRECCIÓN: Usamos el Flow de consulta del repositorio.
+    // Esto hace que la lista se actualice automáticamente cuando cambia la DB.
     val favorites: StateFlow<List<Event>> = repository.getFavoriteEvents()
         .stateIn(
             scope = viewModelScope,
@@ -22,13 +21,15 @@ class FavoritesViewModel(private val repository: EventRepository) : ViewModel() 
             initialValue = emptyList()
         )
 
+    // CORRECCIÓN: Pasamos el ID del evento según la firma que definimos en el repositorio.
     fun toggleFavorite(event: Event) {
         viewModelScope.launch {
-            repository.toggleFavorite(event)
+            repository.toggleFavorite(event.id)
         }
     }
 }
 
+// FACTORY: El "pegamento" para inyectar el repositorio en el ViewModel.
 class FavoritesViewModelFactory(private val repository: EventRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FavoritesViewModel::class.java)) {

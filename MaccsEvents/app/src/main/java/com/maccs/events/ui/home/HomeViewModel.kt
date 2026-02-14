@@ -5,10 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.maccs.events.data.model.Event
 import com.maccs.events.data.repository.EventRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 // DEFINICIÓN DEL ESTADO DE LA UI
@@ -21,73 +18,58 @@ data class HomeUiState(
 
 class HomeViewModel(private val repository: EventRepository) : ViewModel() {
 
-    // Usamos un StateFlow complejo para manejar carga, búsqueda y lista a la vez
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    private val _searchQuery = MutableStateFlow("")
+    private val _isSearching = MutableStateFlow(false)
 
-    // Guardamos la lista completa para filtrar sobre ella sin machacarla
-    private var fullEventList: List<Event> = emptyList()
-
-    init {
-        loadEvents()
-    }
-
-    private fun loadEvents() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-
-            // Recolectamos del repositorio real (Room)
-            repository.getEvents().collect { events ->
-                fullEventList = events
-                // Al recibir datos nuevos, volvemos a aplicar el filtro si hay una búsqueda activa
-                val currentQuery = _uiState.value.searchQuery
-                val eventsToShow = if (currentQuery.isBlank()) {
-                    events
-                } else {
-                    events.filter { it.name.contains(currentQuery, ignoreCase = true) }
-                }
-
-                _uiState.update {
-                    it.copy(events = eventsToShow, isLoading = false)
-                }
-            }
+    // Combinamos el Flow de Room con el Flow de la búsqueda
+    // Así, si cambia la DB O cambias el texto de búsqueda, la UI se actualiza sola
+    val uiState: StateFlow<HomeUiState> = combine(
+        repository.getEventsFlow(), // Usamos el Flow continuo de Room
+        _searchQuery,
+        _isSearching
+    ) { events, query, searching ->
+        val filteredEvents = if (query.isBlank()) {
+            events
+        } else {
+            events.filter { it.name.contains(query, ignoreCase = true) }
         }
-    }
+
+        HomeUiState(
+            isLoading = false,
+            events = filteredEvents,
+            searchQuery = query,
+            isSearching = searching
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState(isLoading = true)
+    )
 
     // --- LÓGICA DE BÚSQUEDA ---
     fun onSearchQueryChanged(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-
-        if (query.isBlank()) {
-            _uiState.update { it.copy(events = fullEventList) }
-        } else {
-            val filtered = fullEventList.filter {
-                it.name.contains(query, ignoreCase = true)
-            }
-            _uiState.update { it.copy(events = filtered) }
-        }
+        _searchQuery.value = query
     }
 
     fun toggleSearchMode() {
-        _uiState.update { currentState ->
-            val newSearchMode = !currentState.isSearching
-            if (!newSearchMode) {
-                // Al cerrar búsqueda, limpiamos
-                onSearchQueryChanged("")
-            }
-            currentState.copy(isSearching = newSearchMode)
+        _isSearching.update { !it }
+        if (!_isSearching.value) {
+            onSearchQueryChanged("")
         }
     }
 
-    // --- LÓGICA DE FAVORITOS (Rescatada del primer ViewModel) ---
+    // --- LÓGICA DE FAVORITOS ---
     fun toggleFavorite(event: Event) {
         viewModelScope.launch {
-            repository.toggleFavorite(event)
+            // Usamos el ID para que el repositorio busque la entidad fresca en la DB
+            repository.toggleFavorite(event.id)
         }
     }
 }
 
-// --- FACTORY (Rescatada del primer ViewModel) ---
+
+
+// --- FACTORY ---
 class HomeViewModelFactory(private val repository: EventRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {

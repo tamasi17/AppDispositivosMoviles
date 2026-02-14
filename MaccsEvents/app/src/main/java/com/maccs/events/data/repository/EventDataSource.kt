@@ -1,9 +1,12 @@
 package com.maccs.events.data.repository
 
 import com.maccs.events.data.model.Event
+import kotlinx.coroutines.flow.Flow
 
 interface EventDataSource {
     suspend fun getEvents(): List<Event>
+    fun getEventsFlow(): Flow<List<Event>>
+    fun getFavoriteEvents(): Flow<List<Event>>
     suspend fun getEventById(eventId: String): Event?
     suspend fun toggleFavorite(id: String)
     suspend fun toggleAttendance(eventId: String)

@@ -10,8 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.Date
 
 data class EventFormUiState(
+    val id: String = "", // Añadimos el ID al estado
     val name: String = "",
     val location: String = "",
     val date: String = "",
@@ -31,85 +35,89 @@ class EventFormViewModel(
     private val _uiState = MutableStateFlow(EventFormUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
     init {
-        _uiState.update { it.copy(isEditing = eventId != null) }
         if (eventId != null) {
-            viewModelScope.launch {
-                val event = repository.getEventById(eventId)
-                event?.let { e ->
-                    _uiState.update {
-                        it.copy(
-                            name = e.name,
-                            location = e.location,
-                            price = e.price.toString(),
-                            description = e.longDescription,
-                            imageUrl = e.imageUrl,
-                            date = "01/01/2026" // Valor por defecto o extraído de e.date
-                        )
-                    }
+            _uiState.update { it.copy(isEditing = true, id = eventId) }
+            loadEventData(eventId)
+        }
+    }
+
+    private fun loadEventData(id: String) {
+        viewModelScope.launch {
+            val event = repository.getEventById(id)
+            event?.let { e ->
+                _uiState.update {
+                    it.copy(
+                        name = e.name,
+                        location = e.location,
+                        price = e.price.toString(),
+                        description = e.longDescription,
+                        imageUrl = e.imageUrl,
+                        // Convertimos el Long de la DB a String para el TextField
+                        date = dateFormatter.format(Date(e.date))
+                    )
                 }
             }
         }
     }
 
+    // --- ACTUALIZACIONES DE ESTADO ---
     fun onNameChange(n: String) = _uiState.update { it.copy(name = n) }
     fun onLocationChange(l: String) = _uiState.update { it.copy(location = l) }
     fun onDateChange(d: String) = _uiState.update { it.copy(date = d) }
     fun onTimeChange(t: String) = _uiState.update { it.copy(time = t) }
     fun onPriceChange(p: String) = _uiState.update { it.copy(price = p) }
     fun onDescriptionChange(d: String) = _uiState.update { it.copy(description = d) }
-    fun onImageUrlChange(url: String) {
-        _uiState.update { it.copy(imageUrl = url) }
-    }
+    fun onImageUrlChange(url: String) = _uiState.update { it.copy(imageUrl = url) }
+
     fun saveEvent() {
         val s = _uiState.value
 
         viewModelScope.launch {
-            // 1. Obtener el Usuario (Lógica de Firebase)
-            // Usamos un ID temporal si el login aún no está listo
             val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
             val currentUserId = currentUser?.uid ?: "usuario_temporal_pruebas"
 
-            if (eventId == null) {
-                // --- CASO 1: CREAR NUEVO EVENTO ---
+            // Convertimos el String del formulario a Long para Room
+            val dateAsLong = try {
+                dateFormatter.parse(s.date)?.time ?: System.currentTimeMillis()
+            } catch (e: Exception) {
+                System.currentTimeMillis()
+            }
+
+            if (!s.isEditing) {
+                // --- CREAR NUEVO ---
                 val newEvent = Event(
                     id = UUID.randomUUID().toString(),
                     name = s.name,
                     location = s.location,
-                    date = System.currentTimeMillis(),
+                    date = dateAsLong,
                     shortDescription = s.description.take(50),
                     longDescription = s.description,
                     price = s.price.toDoubleOrNull() ?: 0.0,
-                    // Si no hay foto, ponemos una aleatoria de Lorem Picsum
                     imageUrl = s.imageUrl.ifBlank { "https://picsum.photos/400/200" },
                     isFavorite = false,
-                    userId = currentUserId // <--- ASIGNAMOS EL DUEÑO AQUÍ
+                    userId = currentUserId
                 )
                 repository.insertEvent(newEvent)
-
             } else {
-                // --- CASO 2: EDITAR EVENTO EXISTENTE ---
-                // Primero recuperamos el evento original para no perder su ID ni su userId original
-                val existingEvent = repository.getEventById(eventId)
-
+                // --- ACTUALIZAR ---
+                val existingEvent = repository.getEventById(s.id)
                 existingEvent?.let { event ->
-                    // Creamos una copia con los datos nuevos del formulario
-                    val eventToUpdate = event.copy(
+                    val updatedEvent = event.copy(
                         name = s.name,
                         location = s.location,
-                        date = System.currentTimeMillis(),
+                        date = dateAsLong,
                         shortDescription = s.description.take(50),
                         longDescription = s.description,
                         price = s.price.toDoubleOrNull() ?: 0.0,
-                        imageUrl = s.imageUrl.ifBlank { event.imageUrl } // Mantenemos la foto anterior si está vacía
-                        // IMPORTANTE: No cambiamos el 'userId' al editar.
-                        // El evento sigue perteneciendo a quien lo creó.
+                        imageUrl = s.imageUrl.ifBlank { event.imageUrl }
                     )
-                    repository.updateEvent(eventToUpdate)
+                    repository.updateEvent(updatedEvent)
                 }
             }
 
-            // 3. Avisar a la UI que hemos terminado
             _uiState.update { it.copy(isSaved = true) }
         }
     }
@@ -120,6 +128,10 @@ class EventFormViewModelFactory(
     private val eventId: String?
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return EventFormViewModel(repository, eventId) as T
+        if (modelClass.isAssignableFrom(EventFormViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return EventFormViewModel(repository, eventId) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

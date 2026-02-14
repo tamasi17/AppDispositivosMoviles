@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
-// 1. DEFINICIÓN DE ESTADOS (Exito, Error, Cargando)
+// 1. DEFINICIÓN DE ESTADOS
 sealed interface EventDetailUiState {
     object Loading : EventDetailUiState
     data class Error(val message: String) : EventDetailUiState
     data class Success(val event: Event) : EventDetailUiState
 }
+
 class EventDetailViewModel(
     private val repository: EventRepository,
     private val eventId: String
@@ -24,6 +24,9 @@ class EventDetailViewModel(
 
     private val _uiState = MutableStateFlow<EventDetailUiState>(EventDetailUiState.Loading)
     val uiState: StateFlow<EventDetailUiState> = _uiState.asStateFlow()
+
+    private val _isDeleted = MutableStateFlow(false)
+    val isDeleted = _isDeleted.asStateFlow()
 
     init {
         loadEvent()
@@ -33,47 +36,49 @@ class EventDetailViewModel(
         viewModelScope.launch {
             _uiState.value = EventDetailUiState.Loading
 
+            // Obtenemos el evento por ID desde Room
             val event = repository.getEventById(eventId)
             if (event != null) {
                 _uiState.value = EventDetailUiState.Success(event)
             } else {
-                _uiState.value = EventDetailUiState.Error("No se encontró el evento")
+                _uiState.value = EventDetailUiState.Error("Evento no encontrado o eliminado")
             }
         }
     }
+
+    // TOGGLE FAVORITO
     fun toggleFavorite() {
-        // Para acceder al evento dentro del estado Success, usamos smart cast
         val currentState = _uiState.value
         if (currentState is EventDetailUiState.Success) {
-            val event = currentState.event
             viewModelScope.launch {
-                repository.toggleFavorite(event)
-                // Recargamos para actualizar la UI
-                loadEvent()
+                // Usamos el ID como definimos en el Repositorio corregido
+                repository.toggleFavorite(eventId)
+
+                // Opción A: Volver a pedir el objeto para refrescar la pantalla
+                val updatedEvent = repository.getEventById(eventId)
+                if (updatedEvent != null) {
+                    _uiState.value = EventDetailUiState.Success(updatedEvent)
+                }
             }
         }
     }
 
-    private val _isDeleted = MutableStateFlow(false)
-    val isDeleted = _isDeleted.asStateFlow()
-
-    // 2. FUNCIÓN DE BORRADO
+    // FUNCIÓN DE BORRADO
     fun deleteEvent() {
         val currentState = _uiState.value
         if (currentState is EventDetailUiState.Success) {
             val eventToDelete = currentState.event
             viewModelScope.launch {
+                // Usamos el repositorio real para borrar de Room
                 repository.deleteEvent(eventToDelete)
-                // Avisamos a la UI que el borrado ha terminado
+                // Avisamos a la UI para que cierre la pantalla de detalle y vuelva al Home
                 _isDeleted.value = true
             }
         }
     }
-
-
 }
 
-// --- FACTORY: Necesaria para pasar ID y Repo al ViewModel ---
+// --- FACTORY ---
 class EventDetailViewModelFactory(
     private val repository: EventRepository,
     private val eventId: String

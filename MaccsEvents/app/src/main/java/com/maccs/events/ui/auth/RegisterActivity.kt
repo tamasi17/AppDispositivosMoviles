@@ -27,6 +27,10 @@ class RegisterActivity : ComponentActivity() {
                 onSuccess = {
                     startActivity(Intent(this, HomeActivity::class.java))
                     finish()
+                },onLoginClick = {
+                    // Creamos el Intent para ir a LoginActivity
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
                 }
             )
         }

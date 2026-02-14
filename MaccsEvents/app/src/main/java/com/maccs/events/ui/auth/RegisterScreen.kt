@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.*
@@ -18,12 +19,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.maccs.events.R
 import com.maccs.events.ui.theme.*
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
+fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit,
+                   onLoginClick: () -> Unit) {
     val context = LocalContext.current
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -71,7 +74,8 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             value = name, onValueChange = { name = it },
             label = { Text("Nombre Completo", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White),
+            shape = RoundedCornerShape(12.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -80,7 +84,8 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             value = email, onValueChange = { email = it },
             label = { Text("Email", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White),
+            shape = RoundedCornerShape(12.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -90,7 +95,8 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             label = { Text("Contraseña", fontFamily = NunitoFamily) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LightPurple, unfocusedTextColor = White, focusedTextColor = White),
+            shape = RoundedCornerShape(12.dp)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -105,6 +111,18 @@ fun RegisterScreen(viewModel: RegisterViewModel, onSuccess: () -> Unit) {
             ) {
                 Text("REGISTRARSE", fontWeight = FontWeight.Bold, fontFamily = NunitoFamily)
             }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // texto debajo del botón de entrar
+        TextButton(onClick = { onLoginClick()}) {
+            Text(
+                text = "¿Ya tienes cuenta? Inicia sesión",
+                color = White.copy(alpha = 0.7f),
+                fontSize = 14.sp,
+                fontFamily = NunitoFamily
+            )
         }
     }
 }

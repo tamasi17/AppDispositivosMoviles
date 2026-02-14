@@ -169,7 +169,7 @@ class HomeActivity : ComponentActivity() {
                                     painter = painterResource(id = R.drawable.search_icon_svg),
                                     contentDescription = "Buscar",
                                     modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = LightPurple
                                 )
                             }
                         }
