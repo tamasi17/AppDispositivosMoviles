@@ -203,11 +203,3 @@ fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Un
         )
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilePreview() {
-    MaccsEventsTheme {
-        Text("Vista previa cargando...", color = Color.White, fontFamily = NunitoFamily)
-    }
-}
