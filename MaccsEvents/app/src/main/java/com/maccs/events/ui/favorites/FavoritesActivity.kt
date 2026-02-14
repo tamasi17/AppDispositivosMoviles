@@ -48,7 +48,7 @@ class FavoritesActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Mis Favoritos", fontFamily = NunitoFamily) },
+                    title = { Text("Mis Favoritos", style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily)) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Black,
                         titleContentColor = LightPurple

@@ -45,10 +45,8 @@ fun EventFormScreen(viewModel: EventFormViewModel,
         // Título dinámico según el estado
         Text(
             text = if (state.isEditing) "Editar Evento" else "Nuevo Evento",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = LightPurple,
-            fontFamily = NunitoFamily
+            style = MaterialTheme.typography.titleLarge.copy(fontFamily = NunitoFamily),
+            color = LightPurple
         )
 
         Text(
