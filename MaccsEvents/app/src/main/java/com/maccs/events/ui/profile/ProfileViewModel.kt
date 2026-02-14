@@ -17,15 +17,13 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val currentUser = auth.currentUser
 
-
+    // El ID de Firebase es nuestra clave para Room
     val idNoEditable = currentUser?.uid ?: "Sin ID"
 
-
+    // Estados para la UI
     var nombre by mutableStateOf("")
     var mail by mutableStateOf("")
     var imageUri by mutableStateOf<Uri?>(null)
-
-
     var isEditable by mutableStateOf(false)
 
     init {
@@ -38,6 +36,7 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
             user?.let {
                 nombre = it.name
                 mail = it.email
+                // Si el path no es nulo, lo convertimos a Uri
                 imageUri = it.profileImagePath?.let { path -> Uri.parse(path) }
             }
         }
@@ -48,6 +47,8 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
     fun onImageSelected(uri: Uri?) { imageUri = uri }
 
     fun toggleEdit() {
+        // Si estamos cancelando la edición (isEditable es true y va a pasar a false)
+        // recargamos los datos originales para descartar cambios no guardados
         if (isEditable) {
             cargarDatosDesdeRoom()
         }
@@ -62,6 +63,7 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
                 email = mail,
                 profileImagePath = imageUri?.toString()
             )
+            // Room insertUser debería usar OnConflictStrategy.REPLACE en el DAO
             userDao.insertUser(user)
             isEditable = false
         }
@@ -73,7 +75,7 @@ class ProfileViewModel(private val userDao: UserDao) : ViewModel() {
     }
 }
 
-
+// --- FACTORY ---
 class ProfileViewModelFactory(private val userDao: UserDao) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
@@ -82,6 +84,4 @@ class ProfileViewModelFactory(private val userDao: UserDao) : ViewModelProvider.
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
-
-
 }

@@ -8,20 +8,38 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-// Hacemos que el repositorio implemente la interfaz
 class EventRepository(private val eventDao: EventDao) : EventDataSource {
 
-    // Cambiamos a Flow para que la UI se actualice en tiempo real
+    // --- CONSULTAS (READ) ---
+
+    // Obtener lista estática (una sola vez)
     override suspend fun getEvents(): List<Event> {
-        // .first() toma el primer valor emitido por el Flow del DAO
         return eventDao.getAllEvents().map { entities ->
             entities.map { it.toDomain() }
         }.first()
     }
 
+    // Obtener Flow para Home (Reactivo)
+    override fun getEventsFlow(): Flow<List<Event>> {
+        return eventDao.getAllEvents().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    // Obtener Flow para Favoritos (Reactivo)
+    override fun getFavoriteEvents(): Flow<List<Event>> {
+        return eventDao.getFavoriteEvents().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    // Obtener un evento específico
     override suspend fun getEventById(eventId: String): Event? {
         return eventDao.getEventById(eventId)?.toDomain()
     }
+
+
+    // --- ACCIONES (WRITE) ---
 
     override suspend fun toggleFavorite(id: String) {
         val entity = eventDao.getEventById(id)
@@ -34,26 +52,23 @@ class EventRepository(private val eventDao: EventDao) : EventDataSource {
     override suspend fun toggleAttendance(eventId: String) {
         val entity = eventDao.getEventById(eventId)
         entity?.let {
-            val updated = it.copy(isAttending = !it.isAttending) // Asegúrate que isAttending exista en tu Entity
+            val updated = it.copy(isAttending = !it.isAttending)
             eventDao.update(updated)
         }
     }
 
-    // --- Métodos extra que no están en la interfaz pero son útiles ---
-
-    override fun getEventsFlow(): Flow<List<Event>> {
-        return eventDao.getAllEvents().map { entities ->
-            entities.map { it.toDomain() }
-        }
-    }
-
-    override fun getFavoriteEvents(): Flow<List<Event>> {
-        return eventDao.getFavoriteEvents().map { entities ->
-            entities.map { it.toDomain() }
-        }
-    }
-
+    // Usado por EventFormViewModel para crear nuevos
     suspend fun insertEvent(event: Event) {
         eventDao.insert(event.toEntity())
+    }
+
+    // Usado por EventFormViewModel para editar existentes
+    suspend fun updateEvent(event: Event) {
+        eventDao.update(event.toEntity())
+    }
+
+    // Usado por EventDetailViewModel para borrar
+    suspend fun deleteEvent(event: Event) {
+        eventDao.delete(event.toEntity())
     }
 }

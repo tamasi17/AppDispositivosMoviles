@@ -44,7 +44,7 @@ fun AppBottomBar() {
                 shape = barShape    // <--- ESTO REDONDEA EL BORDE
             )
             .clip(barShape),        // <--- ESTO REDONDEA EL CONTENIDO/FONDO
-        containerColor = if (isDark) Color.Black else Color.White,
+        containerColor = Color.Black,
         tonalElevation = 0.dp
     ) {
         items.forEach { screen ->
